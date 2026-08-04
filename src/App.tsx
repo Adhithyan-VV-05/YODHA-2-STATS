@@ -14,6 +14,7 @@ import { TeamsPage } from './pages/TeamsPage';
 import { ParticipantsPage } from './pages/ParticipantsPage';
 import { VisitorsPage } from './pages/VisitorsPage';
 import { AnalyticsPage } from './pages/AnalyticsPage';
+import { ReferralsPage } from './pages/ReferralsPage';
 import { ExportsPage } from './pages/ExportsPage';
 import { SettingsPage } from './pages/SettingsPage';
 
@@ -43,6 +44,7 @@ function AppContent() {
               <Route path="/teams" element={<TeamsPage />} />
               <Route path="/participants" element={<ParticipantsPage />} />
               <Route path="/visitors" element={<VisitorsPage />} />
+              <Route path="/referrals" element={<ReferralsPage />} />
               <Route path="/analytics" element={<AnalyticsPage />} />
               <Route path="/exports" element={<ExportsPage />} />
               <Route path="/settings" element={<SettingsPage />} />

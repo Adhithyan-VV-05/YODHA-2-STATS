@@ -282,3 +282,110 @@ export async function updateFirestoreTeamStatus(db: Firestore, teamId: string, s
 export async function deleteFirestoreTeam(db: Firestore, teamId: string) {
   await deleteDoc(doc(db, 'registrations', teamId));
 }
+
+export interface ReferralRoom {
+  id: string;
+  referralCode: string;
+  teamId: string;
+  teamName: string;
+  leaderName: string;
+  leaderEmail: string;
+  leaderPhone: string;
+  totalReferrals: number;
+  createdAt: string;
+  lastReferralAt?: string;
+}
+
+export interface ReferredTeamEntry {
+  id: string;
+  teamId: string;
+  teamName: string;
+  leaderName: string;
+  leaderEmail: string;
+  leaderPhone: string;
+  registeredAt: string;
+}
+
+export function subscribeToReferralRooms(
+  db: Firestore,
+  onData: (rooms: ReferralRoom[]) => void,
+  onError: (err: any) => void
+) {
+  try {
+    const q = query(collection(db, 'referral_rooms'));
+    return onSnapshot(q, (snapshot) => {
+      const rooms: ReferralRoom[] = [];
+      snapshot.forEach((docSnap) => {
+        const d = docSnap.data();
+        let createdAt = new Date().toISOString();
+        if (d.createdAt && d.createdAt.seconds) {
+          createdAt = new Date(d.createdAt.seconds * 1000).toISOString();
+        } else if (d.createdAt) {
+          createdAt = d.createdAt;
+        }
+
+        let lastReferralAt: string | undefined = undefined;
+        if (d.lastReferralAt && d.lastReferralAt.seconds) {
+          lastReferralAt = new Date(d.lastReferralAt.seconds * 1000).toISOString();
+        } else if (d.lastReferralAt) {
+          lastReferralAt = d.lastReferralAt;
+        }
+
+        rooms.push({
+          id: docSnap.id,
+          referralCode: d.referralCode || docSnap.id,
+          teamId: d.teamId || '',
+          teamName: d.teamName || 'Unknown Team',
+          leaderName: d.leaderName || 'Unknown Leader',
+          leaderEmail: d.leaderEmail || '',
+          leaderPhone: d.leaderPhone || '',
+          totalReferrals: d.totalReferrals || 0,
+          createdAt,
+          lastReferralAt,
+        });
+      });
+      rooms.sort((a, b) => b.totalReferrals - a.totalReferrals);
+      onData(rooms);
+    }, onError);
+  } catch (err) {
+    onError(err);
+    return () => {};
+  }
+}
+
+export function subscribeToRoomReferrals(
+  db: Firestore,
+  referralCode: string,
+  onData: (entries: ReferredTeamEntry[]) => void,
+  onError: (err: any) => void
+) {
+  try {
+    const q = query(collection(db, 'referral_rooms', referralCode, 'referrals'));
+    return onSnapshot(q, (snapshot) => {
+      const entries: ReferredTeamEntry[] = [];
+      snapshot.forEach((docSnap) => {
+        const d = docSnap.data();
+        let registeredAt = new Date().toISOString();
+        if (d.registeredAt && d.registeredAt.seconds) {
+          registeredAt = new Date(d.registeredAt.seconds * 1000).toISOString();
+        } else if (d.registeredAt) {
+          registeredAt = d.registeredAt;
+        }
+
+        entries.push({
+          id: docSnap.id,
+          teamId: d.teamId || docSnap.id,
+          teamName: d.teamName || 'Unknown Team',
+          leaderName: d.leaderName || 'Unknown Leader',
+          leaderEmail: d.leaderEmail || '',
+          leaderPhone: d.leaderPhone || '',
+          registeredAt,
+        });
+      });
+      onData(entries);
+    }, onError);
+  } catch (err) {
+    onError(err);
+    return () => {};
+  }
+}
