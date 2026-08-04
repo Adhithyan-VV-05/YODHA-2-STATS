@@ -21,6 +21,8 @@ export interface OverviewMetrics {
   conversionRate: number;
   registrationGrowthPercent: number;
   visitsGrowthPercent: number;
+  totalReferralCodes?: number;
+  totalSuccessfulReferrals?: number;
   lastUpdatedIST: string;
 }
 

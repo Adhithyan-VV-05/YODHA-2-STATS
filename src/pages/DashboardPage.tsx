@@ -26,6 +26,7 @@ import {
   Edit3,
   Download,
   Sparkles,
+  Gift,
   Layers,
   ChevronLeft,
   ChevronRight
@@ -81,6 +82,8 @@ export const DashboardPage: React.FC = () => {
     { title: 'Total Teams', value: metrics.totalTeams, icon: Users, growth: '+12.5%' },
     { title: 'Total Participants', value: metrics.totalParticipants, icon: UserCheck, growth: '+24.1%' },
     { title: "Today's Registrations", value: metrics.todayRegistrations, icon: Zap, growth: 'Today' },
+    { title: 'Referral Codes', value: metrics.totalReferralCodes || 0, icon: Gift, growth: 'Active Rooms' },
+    { title: 'Successful Referrals', value: metrics.totalSuccessfulReferrals || 0, icon: Gift, growth: 'Referred Teams' },
     { title: 'Healthcare Teams', value: metrics.healthcareTeams, icon: HeartPulse, growth: 'Track Lead' },
     { title: 'Environment Teams', value: metrics.environmentTeams, icon: Leaf, growth: 'Active' },
     { title: 'Average Team Size', value: metrics.avgTeamSize, decimals: 1, suffix: ' members', icon: Users, growth: 'Avg Size' },

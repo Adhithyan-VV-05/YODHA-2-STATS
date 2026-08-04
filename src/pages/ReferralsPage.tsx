@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { db } from '../services/firebase';
-import { subscribeToReferralRooms, subscribeToRoomReferrals } from '../services/firestoreService';
+import { useCommandCenter } from '../context/CommandCenterContext';
+import { subscribeToRoomReferrals } from '../services/firestoreService';
 import type { ReferralRoom, ReferredTeamEntry } from '../services/firestoreService';
 import { GlassCard } from '../components/common/GlassCard';
 import { formatISTDateTime } from '../utils/formatters';
@@ -14,44 +14,27 @@ import {
   Loader2,
   CheckCircle2,
   Mail,
-  Phone,
-  ShieldAlert
+  Phone
 } from 'lucide-react';
 
 export const ReferralsPage: React.FC = () => {
-  const [rooms, setRooms] = useState<ReferralRoom[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { firestoreDb, referralRooms } = useCommandCenter();
+
   const [search, setSearch] = useState('');
   const [selectedRoom, setSelectedRoom] = useState<ReferralRoom | null>(null);
   const [roomEntries, setRoomEntries] = useState<ReferredTeamEntry[]>([]);
   const [loadingEntries, setLoadingEntries] = useState(false);
 
-  // Subscribe to Referral Rooms
+  // Subscribe to Room Referrals Subcollection when a room modal is opened
   useEffect(() => {
-    const unsubscribe = subscribeToReferralRooms(
-      db,
-      (fetchedRooms) => {
-        setRooms(fetchedRooms);
-        setLoading(false);
-      },
-      (err) => {
-        console.warn('Error subscribing to referral rooms:', err);
-        setLoading(false);
-      }
-    );
-    return () => unsubscribe();
-  }, []);
-
-  // Subscribe to Room Referrals Subcollection when a room is opened
-  useEffect(() => {
-    if (!selectedRoom) {
+    if (!selectedRoom || !firestoreDb) {
       setRoomEntries([]);
       return;
     }
 
     setLoadingEntries(true);
     const unsubscribe = subscribeToRoomReferrals(
-      db,
+      firestoreDb,
       selectedRoom.referralCode,
       (entries) => {
         setRoomEntries(entries);
@@ -64,8 +47,9 @@ export const ReferralsPage: React.FC = () => {
     );
 
     return () => unsubscribe();
-  }, [selectedRoom]);
+  }, [selectedRoom, firestoreDb]);
 
+  const rooms = referralRooms;
   const totalReferralCodes = rooms.length;
   const totalSuccessfulReferrals = rooms.reduce((acc, r) => acc + (r.totalReferrals || 0), 0);
   const topReferringTeam = rooms.length > 0 && rooms[0].totalReferrals > 0
@@ -98,7 +82,7 @@ export const ReferralsPage: React.FC = () => {
 
       {/* Analytics Metric Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <GlassCard variant="default" className="p-4 border-slate-200 bg-white">
+        <GlassCard variant="default" className="p-4 border-slate-200 bg-white shadow-2xs">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Total Referral Codes</span>
             <div className="p-2 rounded-lg bg-amber-50 border border-amber-200 text-amber-600">
@@ -106,10 +90,10 @@ export const ReferralsPage: React.FC = () => {
             </div>
           </div>
           <div className="mt-2 text-2xl font-black text-slate-900">{totalReferralCodes}</div>
-          <p className="text-[11px] text-slate-400 mt-1">Generated Warrior Codes in Firestore</p>
+          <p className="text-[11px] text-slate-500 mt-1">Generated Warrior Codes in Firestore</p>
         </GlassCard>
 
-        <GlassCard variant="default" className="p-4 border-slate-200 bg-white">
+        <GlassCard variant="default" className="p-4 border-slate-200 bg-white shadow-2xs">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Successful Referrals</span>
             <div className="p-2 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-600">
@@ -117,10 +101,10 @@ export const ReferralsPage: React.FC = () => {
             </div>
           </div>
           <div className="mt-2 text-2xl font-black text-slate-900">{totalSuccessfulReferrals}</div>
-          <p className="text-[11px] text-slate-400 mt-1">Teams registered using a Referral Code</p>
+          <p className="text-[11px] text-slate-500 mt-1">Teams registered using a Referral Code</p>
         </GlassCard>
 
-        <GlassCard variant="default" className="p-4 border-slate-200 bg-white">
+        <GlassCard variant="default" className="p-4 border-slate-200 bg-white shadow-2xs">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Top Referring Team</span>
             <div className="p-2 rounded-lg bg-indigo-50 border border-indigo-200 text-indigo-600">
@@ -128,12 +112,12 @@ export const ReferralsPage: React.FC = () => {
             </div>
           </div>
           <div className="mt-2 text-base font-bold text-slate-900 truncate">{topReferringTeam}</div>
-          <p className="text-[11px] text-slate-400 mt-1">Leaderboard Champion</p>
+          <p className="text-[11px] text-slate-500 mt-1">Leaderboard Champion</p>
         </GlassCard>
       </div>
 
       {/* Search Bar */}
-      <GlassCard variant="default" className="p-4 bg-white border-slate-200">
+      <GlassCard variant="default" className="p-4 bg-white border-slate-200 shadow-2xs">
         <div className="relative">
           <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
           <input
@@ -147,19 +131,15 @@ export const ReferralsPage: React.FC = () => {
       </GlassCard>
 
       {/* Referral Rooms Table */}
-      <GlassCard variant="default" className="p-0 overflow-hidden bg-white border-slate-200">
+      <GlassCard variant="default" className="p-0 overflow-hidden bg-white border-slate-200 shadow-2xs">
         <div className="p-4 border-b border-slate-200 bg-slate-50/50 flex items-center justify-between">
           <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2">
             <Users className="w-4 h-4 text-slate-600" /> Active Referral Rooms ({filteredRooms.length})
           </h3>
         </div>
 
-        {loading ? (
-          <div className="p-8 text-center text-slate-400 text-xs flex items-center justify-center gap-2">
-            <Loader2 className="w-4 h-4 animate-spin text-slate-600" /> Loading referral rooms from Firestore...
-          </div>
-        ) : filteredRooms.length === 0 ? (
-          <div className="p-8 text-center text-slate-500 text-xs">
+        {filteredRooms.length === 0 ? (
+          <div className="p-8 text-center text-slate-500 text-xs font-sans">
             No referral rooms found matching your search.
           </div>
         ) : (
@@ -197,9 +177,9 @@ export const ReferralsPage: React.FC = () => {
                     </td>
                     <td className="p-4">
                       <span
-                        className={`px-3 py-1 rounded-full text-xs font-black ${
+                        className={`px-3 py-1 rounded-full text-xs font-bold ${
                           room.totalReferrals > 0
-                            ? 'bg-emerald-100 text-emerald-800 border border-emerald-300'
+                            ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
                             : 'bg-slate-100 text-slate-600 border border-slate-200'
                         }`}
                       >
@@ -228,7 +208,7 @@ export const ReferralsPage: React.FC = () => {
 
       {/* Referral Room Modal Details */}
       {selectedRoom && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
           <div className="bg-white border border-slate-200 rounded-2xl max-w-2xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden font-sans">
             {/* Modal Header */}
             <div className="p-5 border-b border-slate-200 flex items-center justify-between bg-slate-50">
@@ -238,7 +218,7 @@ export const ReferralsPage: React.FC = () => {
                 </span>
                 <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2 mt-0.5">
                   <span>Room:</span>
-                  <span className="font-mono text-amber-700 bg-amber-100 px-2 py-0.5 rounded border border-amber-300">
+                  <span className="font-mono text-amber-800 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
                     {selectedRoom.referralCode}
                   </span>
                 </h3>
@@ -260,7 +240,7 @@ export const ReferralsPage: React.FC = () => {
               </div>
               <div>
                 <span className="text-slate-400 uppercase text-[10px] font-semibold block">TOTAL SUCCESSFUL REFERRALS</span>
-                <span className="font-black text-emerald-700 text-sm block mt-0.5">{selectedRoom.totalReferrals} Teams</span>
+                <span className="font-bold text-emerald-700 text-sm block mt-0.5">{selectedRoom.totalReferrals} Teams</span>
               </div>
               <div>
                 <span className="text-slate-400 uppercase text-[10px] font-semibold block">TEAM LEADER</span>

@@ -15,11 +15,13 @@ import {
   subscribeToUserSessions,
   subscribeToSiteAnalytics,
   subscribeToAdminPasscode,
+  subscribeToReferralRooms,
   updateFirestoreTeam,
   updateFirestoreTeamStatus,
   deleteFirestoreTeam,
   updateFirestoreAdminPasscode
 } from '../services/firestoreService';
+import type { ReferralRoom } from '../services/firestoreService';
 import type { Firestore } from 'firebase/firestore';
 import { useToast } from './ToastContext';
 import { useAdminAuth } from './AdminAuthContext';
@@ -30,6 +32,7 @@ interface CommandCenterContextType {
   participants: Participant[];
   sessions: VisitorSession[];
   activities: ActivityEvent[];
+  referralRooms: ReferralRoom[];
   metrics: OverviewMetrics;
   collegeStats: CollegeStats[];
   quickInsights: QuickInsight[];
@@ -65,6 +68,7 @@ export function CommandCenterProvider({ children }: { children: ReactNode }) {
   const [teams, setTeams] = useState<Team[]>([]);
   const [sessions, setSessions] = useState<VisitorSession[]>([]);
   const [activities, setActivities] = useState<ActivityEvent[]>([]);
+  const [referralRooms, setReferralRooms] = useState<ReferralRoom[]>([]);
   const [siteAnalyticsDoc, setSiteAnalyticsDoc] = useState<any>(null);
 
   const [selectedTeam, setSelectedTeam] = useState<Team | null>(null);
@@ -130,11 +134,20 @@ export function CommandCenterProvider({ children }: { children: ReactNode }) {
         () => {}
       );
 
+      const unsubReferrals = subscribeToReferralRooms(
+        db,
+        (fetchedRooms) => {
+          setReferralRooms(fetchedRooms);
+        },
+        () => {}
+      );
+
       return () => {
         unsubReg();
         unsubSess();
         unsubStats();
         unsubPasscode();
+        unsubReferrals();
       };
     }
   }, []);
@@ -147,6 +160,9 @@ export function CommandCenterProvider({ children }: { children: ReactNode }) {
   const totalSessions = sessions.length;
   const totalTeams = teams.length;
   const totalParticipants = participants.length;
+
+  const totalReferralCodes = siteAnalyticsDoc?.totalReferralCodes || referralRooms.length;
+  const totalSuccessfulReferrals = siteAnalyticsDoc?.totalSuccessfulReferrals || referralRooms.reduce((acc, r) => acc + (r.totalReferrals || 0), 0);
 
   const todayStr = new Date().toISOString().split('T')[0];
   const nowMs = Date.now();
@@ -204,6 +220,8 @@ export function CommandCenterProvider({ children }: { children: ReactNode }) {
     conversionRate,
     registrationGrowthPercent: 0,
     visitsGrowthPercent: 0,
+    totalReferralCodes,
+    totalSuccessfulReferrals,
     lastUpdatedIST: formatISTDateTime(new Date())
   };
 
@@ -328,6 +346,7 @@ export function CommandCenterProvider({ children }: { children: ReactNode }) {
         participants,
         sessions,
         activities,
+        referralRooms,
         metrics: computedMetrics,
         collegeStats,
         quickInsights,
