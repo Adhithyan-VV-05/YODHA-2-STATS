@@ -47,10 +47,6 @@ export const VisitorsPage: React.FC = () => {
   const desktopPct = totalSessions > 0 ? Number(((desktopSessions / totalSessions) * 100).toFixed(1)) : 0;
   const mobilePct = totalSessions > 0 ? Number(((mobileSessions / totalSessions) * 100).toFixed(1)) : 0;
 
-  // Device Counts
-  const deviceCounts: Record<string, number> = {};
-  sessions.forEach(s => { deviceCounts[s.device] = (deviceCounts[s.device] || 0) + 1; });
-
   // Browser Counts
   const browserCounts: Record<string, number> = {};
   sessions.forEach(s => { browserCounts[s.browser] = (browserCounts[s.browser] || 0) + 1; });
@@ -58,7 +54,7 @@ export const VisitorsPage: React.FC = () => {
   const browserData = Object.entries(browserCounts).map(([name, value], idx) => ({
     name,
     value,
-    color: ['#00f3ff', '#00ff9d', '#ffaa00', '#9d4edd', '#ff0055'][idx % 5]
+    color: ['#0f172a', '#475569', '#64748b', '#94a3b8', '#cbd5e1'][idx % 5]
   }));
 
   // OS Counts
@@ -68,7 +64,7 @@ export const VisitorsPage: React.FC = () => {
   const osData = Object.entries(osCounts).map(([name, value], idx) => ({
     name,
     value,
-    color: ['#00f3ff', '#00ff9d', '#9d4edd', '#ffaa00', '#ff0055'][idx % 5]
+    color: ['#0f172a', '#334155', '#475569', '#64748b', '#94a3b8'][idx % 5]
   }));
 
   // Filtered & Paginated Visitor Sessions Table
@@ -85,66 +81,66 @@ export const VisitorsPage: React.FC = () => {
   const getTabBadge = (tabStatus: string) => {
     switch (tabStatus) {
       case 'Focused':
-        return <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-cyan-950 text-cyan-400 border border-cyan-500/40">🔵 Focused</span>;
+        return <span className="px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-slate-100 text-slate-800 border border-slate-200">Focused</span>;
       case 'Online':
-        return <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-950 text-emerald-400 border border-emerald-500/40">🟢 Online</span>;
+        return <span className="px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">Online</span>;
       case 'Background':
-        return <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-950 text-amber-400 border border-amber-500/40">🟡 Background</span>;
+        return <span className="px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-amber-50 text-amber-700 border border-amber-200">Background</span>;
       default:
-        return <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-900 text-slate-400 border border-slate-800">🔴 Offline</span>;
+        return <span className="px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-slate-50 text-slate-500 border border-slate-200">Offline</span>;
     }
   };
 
   return (
-    <div className="space-y-6 pb-12 font-mono">
+    <div className="space-y-6 pb-12 font-sans">
       {/* HEADER */}
-      <div className="border-b border-cyan-500/20 pb-4">
-        <h1 className="text-xl font-black text-white tracking-widest uppercase flex items-center gap-2">
-          <Eye className="w-5 h-5 text-cyan-400" /> VISITOR ANALYTICS & TELEMETRY
+      <div className="border-b border-slate-200 pb-4">
+        <h1 className="text-xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
+          <Eye className="w-5 h-5 text-slate-700" /> Visitor Analytics
         </h1>
-        <p className="text-xs text-slate-400 mt-1">
-          REAL-TIME TELEMETRY BASED EXCLUSIVELY ON FIRESTORE <code className="text-cyan-400">user_sessions</code> COLLECTION
+        <p className="text-xs text-slate-500 mt-0.5">
+          Real-time user session telemetry and browser analytics
         </p>
       </div>
 
       {/* VISITOR ANALYTICS CARDS */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <GlassCard variant="glow" className="p-4 flex flex-col justify-between">
-          <div className="text-[10px] font-bold text-slate-400 uppercase">Total Sessions</div>
-          <div className="text-2xl font-black text-white mt-1">{totalSessions} Logged</div>
-          <div className="text-[11px] text-slate-400 mt-1 font-bold text-cyan-400">
-            🟢 Live Sessions: {liveSessions}
+        <GlassCard variant="default" className="p-4 flex flex-col justify-between bg-white border-slate-200 shadow-2xs">
+          <div className="text-[11px] font-semibold text-slate-500 uppercase tracking-wide">Total Sessions</div>
+          <div className="text-2xl font-bold text-slate-900 mt-1">{totalSessions} Logged</div>
+          <div className="text-[11px] text-slate-600 mt-1 font-medium">
+            Live Sessions: <strong className="text-emerald-600">{liveSessions}</strong>
           </div>
         </GlassCard>
 
-        <GlassCard variant="default" className="p-4 flex flex-col justify-between">
-          <div className="text-[10px] font-bold text-slate-400 uppercase">Avg Active Time</div>
-          <div className="text-2xl font-black text-emerald-400 mt-1 flex items-center gap-1.5">
-            <Clock className="w-5 h-5" />
+        <GlassCard variant="default" className="p-4 flex flex-col justify-between bg-white border-slate-200 shadow-2xs">
+          <div className="text-[11px] font-semibold text-slate-500 uppercase tracking-wide">Avg Active Time</div>
+          <div className="text-2xl font-bold text-slate-900 mt-1 flex items-center gap-1.5">
+            <Clock className="w-5 h-5 text-slate-500" />
             {formatDuration(metrics.avgActiveTimeSeconds)}
           </div>
-          <div className="text-[11px] text-slate-400 mt-1">
-            Avg Inactive Time: {formatDuration(metrics.avgInactiveTimeSeconds)}
+          <div className="text-[11px] text-slate-500 mt-1">
+            Avg Inactive: {formatDuration(metrics.avgInactiveTimeSeconds)}
           </div>
         </GlassCard>
 
-        <GlassCard variant="default" className="p-4 flex flex-col justify-between">
-          <div className="text-[10px] font-bold text-slate-400 uppercase">Session Duration Bounds</div>
-          <div className="text-2xl font-black text-purple-400 mt-1">
+        <GlassCard variant="default" className="p-4 flex flex-col justify-between bg-white border-slate-200 shadow-2xs">
+          <div className="text-[11px] font-semibold text-slate-500 uppercase tracking-wide">Session Duration Bounds</div>
+          <div className="text-2xl font-bold text-slate-900 mt-1">
             {formatDuration(longestSession)}
           </div>
-          <div className="text-[11px] text-slate-400 mt-1">
-            Shortest Session: {formatDuration(shortestSession)}
+          <div className="text-[11px] text-slate-500 mt-1">
+            Shortest: {formatDuration(shortestSession)}
           </div>
         </GlassCard>
 
-        <GlassCard variant="default" className="p-4 flex flex-col justify-between">
-          <div className="text-[10px] font-bold text-slate-400 uppercase">Device Ratio</div>
-          <div className="text-2xl font-black text-amber-400 mt-1 flex items-center gap-2">
-            <Monitor className="w-5 h-5 text-cyan-400" /> {desktopPct}%
+        <GlassCard variant="default" className="p-4 flex flex-col justify-between bg-white border-slate-200 shadow-2xs">
+          <div className="text-[11px] font-semibold text-slate-500 uppercase tracking-wide">Device Ratio</div>
+          <div className="text-2xl font-bold text-slate-900 mt-1 flex items-center gap-2">
+            <Monitor className="w-5 h-5 text-slate-500" /> {desktopPct}%
           </div>
-          <div className="text-[11px] text-slate-400 mt-1 flex items-center gap-1">
-            <Smartphone className="w-3.5 h-3.5 text-amber-400" /> Mobile / Tablet: {mobilePct}%
+          <div className="text-[11px] text-slate-500 mt-1 flex items-center gap-1">
+            <Smartphone className="w-3.5 h-3.5 text-slate-400" /> Mobile / Tablet: {mobilePct}%
           </div>
         </GlassCard>
       </div>
@@ -152,16 +148,16 @@ export const VisitorsPage: React.FC = () => {
       {/* SIMPLE CHARTS: BROWSER & OS DISTRIBUTION */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Browser Distribution Donut Chart */}
-        <GlassCard variant="default" className="p-5 flex flex-col justify-between h-[320px]">
-          <div className="border-b border-cyan-500/20 pb-3 mb-3 flex items-center justify-between">
-            <h3 className="text-xs font-bold text-white uppercase flex items-center gap-2">
-              <Globe className="w-4 h-4 text-cyan-400" /> Browser Distribution
+        <GlassCard variant="default" className="p-5 flex flex-col justify-between h-[320px] bg-white border-slate-200">
+          <div className="border-b border-slate-100 pb-3 mb-3 flex items-center justify-between">
+            <h3 className="text-xs font-bold text-slate-900 uppercase flex items-center gap-2">
+              <Globe className="w-4 h-4 text-slate-700" /> Browser Distribution
             </h3>
-            <span className="text-[10px] text-slate-400">FIRESTORE SESSIONS</span>
+            <span className="text-[11px] text-slate-400 font-medium">FIRESTORE SESSIONS</span>
           </div>
 
           {browserData.length === 0 ? (
-            <div className="flex-1 flex items-center justify-center text-slate-500 text-xs">
+            <div className="flex-1 flex items-center justify-center text-slate-400 text-xs">
               No browser sessions recorded.
             </div>
           ) : (
@@ -173,7 +169,7 @@ export const VisitorsPage: React.FC = () => {
                       <Cell key={`cell-${index}`} fill={entry.color} />
                     ))}
                   </Pie>
-                  <Tooltip contentStyle={{ backgroundColor: '#090d16', borderColor: '#00f3ff', borderRadius: '12px', color: '#fff' }} />
+                  <Tooltip contentStyle={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0', borderRadius: '8px', color: '#0f172a', fontSize: '12px' }} />
                 </PieChart>
               </ResponsiveContainer>
             </div>
@@ -181,26 +177,26 @@ export const VisitorsPage: React.FC = () => {
         </GlassCard>
 
         {/* Operating System Distribution Bar Chart */}
-        <GlassCard variant="default" className="p-5 flex flex-col justify-between h-[320px]">
-          <div className="border-b border-cyan-500/20 pb-3 mb-3 flex items-center justify-between">
-            <h3 className="text-xs font-bold text-white uppercase flex items-center gap-2">
-              <Cpu className="w-4 h-4 text-emerald-400" /> Operating System Distribution
+        <GlassCard variant="default" className="p-5 flex flex-col justify-between h-[320px] bg-white border-slate-200">
+          <div className="border-b border-slate-100 pb-3 mb-3 flex items-center justify-between">
+            <h3 className="text-xs font-bold text-slate-900 uppercase flex items-center gap-2">
+              <Cpu className="w-4 h-4 text-slate-700" /> Operating System Distribution
             </h3>
-            <span className="text-[10px] text-slate-400">FIRESTORE SESSIONS</span>
+            <span className="text-[11px] text-slate-400 font-medium">FIRESTORE SESSIONS</span>
           </div>
 
           {osData.length === 0 ? (
-            <div className="flex-1 flex items-center justify-center text-slate-500 text-xs">
+            <div className="flex-1 flex items-center justify-center text-slate-400 text-xs">
               No OS telemetry recorded.
             </div>
           ) : (
             <div className="w-full h-52">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={osData}>
-                  <XAxis dataKey="name" stroke="#64748b" tick={{ fill: '#94a3b8', fontSize: 11 }} />
-                  <YAxis stroke="#64748b" tick={{ fill: '#94a3b8', fontSize: 11 }} />
-                  <Tooltip contentStyle={{ backgroundColor: '#090d16', borderColor: '#00ff9d', borderRadius: '12px', color: '#fff' }} />
-                  <Bar dataKey="value" fill="#00ff9d" radius={[6, 6, 0, 0]} name="Sessions" />
+                  <XAxis dataKey="name" stroke="#94a3b8" tick={{ fill: '#64748b', fontSize: 11 }} />
+                  <YAxis stroke="#94a3b8" tick={{ fill: '#64748b', fontSize: 11 }} />
+                  <Tooltip contentStyle={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0', borderRadius: '8px', color: '#0f172a', fontSize: '12px' }} />
+                  <Bar dataKey="value" fill="#0f172a" radius={[4, 4, 0, 0]} name="Sessions" />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -209,67 +205,65 @@ export const VisitorsPage: React.FC = () => {
       </div>
 
       {/* VISITOR SESSIONS TABLE */}
-      <GlassCard variant="default" className="p-5 overflow-hidden">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-cyan-500/20 pb-4 mb-4">
+      <GlassCard variant="default" className="p-5 overflow-hidden bg-white border-slate-200">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 pb-4 mb-4">
           <div>
-            <h2 className="text-xs font-bold text-white uppercase flex items-center gap-2">
-              <Activity className="w-4 h-4 text-cyan-400" /> VISITOR SESSIONS TABLE ({filteredSessions.length})
+            <h2 className="text-xs font-bold text-slate-900 uppercase flex items-center gap-2">
+              <Activity className="w-4 h-4 text-slate-700" /> Visitor Sessions Table ({filteredSessions.length})
             </h2>
-            <p className="text-[11px] text-slate-400 mt-0.5">EXACT TELEMETRY FROM FIRESTORE user_sessions COLLECTION</p>
+            <p className="text-xs text-slate-500 mt-0.5">Exact session telemetry from Firestore user_sessions collection</p>
           </div>
 
           <div className="relative">
-            <Search className="w-3.5 h-3.5 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
+            <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
             <input
               type="text"
               value={search}
               onChange={e => { setSearch(e.target.value); setCurrentPage(1); }}
               placeholder="Search Session ID, City, Device, Browser..."
-              className="pl-8 pr-3 py-1.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-slate-200 focus:border-cyan-500 outline-none w-64 font-mono"
+              className="pl-8 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-800 focus:border-slate-400 focus:bg-white outline-none w-64 font-sans"
             />
           </div>
         </div>
 
         {paginatedSessions.length === 0 ? (
-          <div className="p-12 text-center text-slate-500 text-xs font-mono">
+          <div className="p-12 text-center text-slate-400 text-xs font-sans">
             No visitor session entries found in Firestore.
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs font-mono">
-              <thead className="bg-slate-950/80 text-cyan-400 uppercase border-b border-cyan-500/20">
+            <table className="w-full text-left text-xs font-sans">
+              <thead className="bg-slate-50 text-slate-600 uppercase text-[11px] font-semibold border-b border-slate-200">
                 <tr>
-                  <th className="p-3">Session / Location</th>
+                  <th className="p-3">Location / Session</th>
                   <th className="p-3">Device & OS</th>
                   <th className="p-3">Browser</th>
                   <th className="p-3">Resolution</th>
                   <th className="p-3">Start Time (IST)</th>
-                  <th className="p-3">End Time (IST)</th>
                   <th className="p-3">Active Time</th>
                   <th className="p-3">Inactive Time</th>
-                  <th className="p-3">Online Status</th>
-                  <th className="p-3">Tab Status</th>
+                  <th className="p-3">Status</th>
+                  <th className="p-3">Tab</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-800/60 text-slate-300">
+              <tbody className="divide-y divide-slate-100 text-slate-700">
                 {paginatedSessions.map((s) => (
-                  <tr key={s.id} className="hover:bg-slate-900/60 transition-colors">
+                  <tr key={s.id} className="hover:bg-slate-50/80 transition-colors">
                     <td className="p-3">
-                      <div className="font-bold text-white">{s.city}, {s.country}</div>
-                      <div className="text-[10px] text-slate-500">{s.id}</div>
+                      <div className="font-semibold text-slate-900">{s.city}, {s.country}</div>
+                      <div className="text-[11px] text-slate-400">{s.id}</div>
                     </td>
-                    <td className="p-3 text-slate-200">{s.device} ({s.os})</td>
-                    <td className="p-3 text-slate-300">{s.browser}</td>
-                    <td className="p-3 text-slate-400 text-[11px]">{s.screenResolution}</td>
-                    <td className="p-3 text-slate-400 text-[11px]">{formatISTDateTime(s.startTime)}</td>
-                    <td className="p-3 text-slate-400 text-[11px]">{s.endTime ? formatISTDateTime(s.endTime) : 'Active Now'}</td>
-                    <td className="p-3 font-bold text-emerald-400">{formatDuration(s.activeTimeSeconds)}</td>
-                    <td className="p-3 text-amber-400">{formatDuration(s.inactiveTimeSeconds)}</td>
+                    <td className="p-3 text-slate-800 font-medium">{s.device} ({s.os})</td>
+                    <td className="p-3 text-slate-600">{s.browser}</td>
+                    <td className="p-3 text-slate-500 text-[11px]">{s.screenResolution}</td>
+                    <td className="p-3 text-slate-500 text-[11px]">{formatISTDateTime(s.startTime)}</td>
+                    <td className="p-3 font-semibold text-emerald-700">{formatDuration(s.activeTimeSeconds)}</td>
+                    <td className="p-3 text-slate-600">{formatDuration(s.inactiveTimeSeconds)}</td>
                     <td className="p-3">
                       {s.isOnline ? (
-                        <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-950 text-emerald-400 border border-emerald-500/40">🟢 Online</span>
+                        <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">Online</span>
                       ) : (
-                        <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-900 text-slate-500 border border-slate-800">🔴 Offline</span>
+                        <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-slate-100 text-slate-500 border border-slate-200">Offline</span>
                       )}
                     </td>
                     <td className="p-3">{getTabBadge(s.tabStatus)}</td>
@@ -282,22 +276,22 @@ export const VisitorsPage: React.FC = () => {
 
         {/* Pagination Footer */}
         {totalPages > 1 && (
-          <div className="flex items-center justify-between pt-4 mt-2 border-t border-slate-800 text-xs">
-            <span className="text-slate-400">
+          <div className="flex items-center justify-between pt-4 mt-2 border-t border-slate-100 text-xs">
+            <span className="text-slate-500">
               Showing page {currentPage} of {totalPages}
             </span>
             <div className="flex items-center gap-2">
               <button
                 disabled={currentPage === 1}
                 onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-                className="p-1.5 rounded-lg bg-slate-900 border border-slate-800 text-slate-300 disabled:opacity-40"
+                className="p-1.5 rounded-md bg-slate-100 border border-slate-200 text-slate-700 disabled:opacity-40 cursor-pointer"
               >
                 <ChevronLeft className="w-4 h-4" />
               </button>
               <button
                 disabled={currentPage === totalPages}
                 onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-                className="p-1.5 rounded-lg bg-slate-900 border border-slate-800 text-slate-300 disabled:opacity-40"
+                className="p-1.5 rounded-md bg-slate-100 border border-slate-200 text-slate-700 disabled:opacity-40 cursor-pointer"
               >
                 <ChevronRight className="w-4 h-4" />
               </button>

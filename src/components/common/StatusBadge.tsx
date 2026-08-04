@@ -13,33 +13,33 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({ status, pulse = true, 
       case 'SYNCED':
       case 'VERIFIED':
         return {
-          bg: 'bg-emerald-500/10',
-          border: 'border-emerald-500/30',
-          text: 'text-emerald-400',
-          dot: 'bg-emerald-400'
+          bg: 'bg-emerald-50',
+          border: 'border-emerald-200',
+          text: 'text-emerald-700',
+          dot: 'bg-emerald-500'
         };
       case 'WARNING':
       case 'PENDING':
         return {
-          bg: 'bg-amber-500/10',
-          border: 'border-amber-500/30',
-          text: 'text-amber-400',
-          dot: 'bg-amber-400'
+          bg: 'bg-amber-50',
+          border: 'border-amber-200',
+          text: 'text-amber-700',
+          dot: 'bg-amber-500'
         };
       case 'ALERT':
       case 'OFFLINE':
         return {
-          bg: 'bg-pink-500/10',
-          border: 'border-pink-500/30',
-          text: 'text-pink-400',
-          dot: 'bg-pink-400'
+          bg: 'bg-rose-50',
+          border: 'border-rose-200',
+          text: 'text-rose-700',
+          dot: 'bg-rose-500'
         };
       default:
         return {
-          bg: 'bg-cyan-500/10',
-          border: 'border-cyan-500/30',
-          text: 'text-cyan-400',
-          dot: 'bg-cyan-400'
+          bg: 'bg-slate-100',
+          border: 'border-slate-200',
+          text: 'text-slate-700',
+          dot: 'bg-slate-500'
         };
     }
   };
@@ -48,7 +48,7 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({ status, pulse = true, 
 
   return (
     <span
-      className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-mono font-semibold uppercase tracking-wider border ${style.bg} ${style.border} ${style.text} ${className}`}
+      className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-sans font-medium uppercase tracking-wide border ${style.bg} ${style.border} ${style.text} ${className}`}
     >
       <span className="relative flex h-2 w-2">
         {pulse && (

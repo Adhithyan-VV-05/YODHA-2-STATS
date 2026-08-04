@@ -76,59 +76,59 @@ export const DashboardPage: React.FC = () => {
   };
 
   const metricCards = [
-    { title: 'Total Website Visits', value: metrics.totalVisits, icon: Eye, color: 'text-cyan-400', border: 'border-cyan-500/30', growth: '+18.4%' },
-    { title: 'Live Visitors', value: metrics.activeUsersOnline, icon: Activity, color: 'text-emerald-400', border: 'border-emerald-500/30', growth: 'Realtime' },
-    { title: 'Total Teams', value: metrics.totalTeams, icon: Users, color: 'text-purple-400', border: 'border-purple-500/30', growth: '+12.5%' },
-    { title: 'Total Participants', value: metrics.totalParticipants, icon: UserCheck, color: 'text-amber-400', border: 'border-amber-500/30', growth: '+24.1%' },
-    { title: "Today's Registrations", value: metrics.todayRegistrations, icon: Zap, color: 'text-emerald-400', border: 'border-emerald-500/30', growth: 'Today (IST)' },
-    { title: 'Healthcare Teams', value: metrics.healthcareTeams, icon: HeartPulse, color: 'text-pink-500', border: 'border-pink-500/30', growth: 'Track Lead' },
-    { title: 'Environment Teams', value: metrics.environmentTeams, icon: Leaf, color: 'text-emerald-400', border: 'border-emerald-500/30', growth: 'Active' },
-    { title: 'Average Team Size', value: metrics.avgTeamSize, decimals: 1, suffix: ' mbrs', icon: Users, color: 'text-cyan-400', border: 'border-cyan-500/30', growth: 'Avg Size' },
-    { title: 'Average Active Time', value: Math.round(metrics.avgActiveTimeSeconds / 60) || 5, suffix: ' mins', icon: Clock, color: 'text-amber-400', border: 'border-amber-500/30', growth: 'Stay Time' }
+    { title: 'Total Website Visits', value: metrics.totalVisits, icon: Eye, growth: '+18.4%' },
+    { title: 'Live Visitors', value: metrics.activeUsersOnline, icon: Activity, growth: 'Realtime' },
+    { title: 'Total Teams', value: metrics.totalTeams, icon: Users, growth: '+12.5%' },
+    { title: 'Total Participants', value: metrics.totalParticipants, icon: UserCheck, growth: '+24.1%' },
+    { title: "Today's Registrations", value: metrics.todayRegistrations, icon: Zap, growth: 'Today' },
+    { title: 'Healthcare Teams', value: metrics.healthcareTeams, icon: HeartPulse, growth: 'Track Lead' },
+    { title: 'Environment Teams', value: metrics.environmentTeams, icon: Leaf, growth: 'Active' },
+    { title: 'Average Team Size', value: metrics.avgTeamSize, decimals: 1, suffix: ' members', icon: Users, growth: 'Avg Size' },
+    { title: 'Average Active Time', value: Math.round(metrics.avgActiveTimeSeconds / 60) || 5, suffix: ' mins', icon: Clock, growth: 'Stay Time' }
   ];
 
   return (
-    <div className="space-y-6 pb-12 font-mono">
+    <div className="space-y-6 pb-12 font-sans">
       {/* LIVE STATUS BAR */}
-      <GlassCard variant="glow" className="p-4 bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950">
+      <GlassCard variant="default" className="p-4 bg-white border border-slate-200">
         <div className="flex flex-wrap items-center justify-between gap-4 text-xs">
           <div className="flex items-center gap-2">
-            <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
-            <span className="font-extrabold text-white flex items-center gap-1.5">
-              <CheckCircle2 className="w-4 h-4 text-emerald-400" /> 🟢 Database Connected
+            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="font-semibold text-slate-900 flex items-center gap-1.5">
+              <CheckCircle2 className="w-4 h-4 text-emerald-600" /> Database Live Sync Active
             </span>
           </div>
 
-          <div className="flex flex-wrap items-center gap-4 text-slate-300">
+          <div className="flex flex-wrap items-center gap-4 text-slate-600">
             <div className="flex items-center gap-1.5">
-              <Users className="w-3.5 h-3.5 text-cyan-400" />
-              <span>👥 Active Online: <strong className="text-cyan-400">{metrics.activeUsersOnline}</strong></span>
+              <Users className="w-3.5 h-3.5 text-slate-500" />
+              <span>Active Online: <strong className="text-slate-900">{metrics.activeUsersOnline}</strong></span>
             </div>
             <div className="flex items-center gap-1.5">
-              <Monitor className="w-3.5 h-3.5 text-emerald-400" />
-              <span>🖥 Desktop: <strong className="text-emerald-400">{metrics.activeDesktopUsers}</strong></span>
+              <Monitor className="w-3.5 h-3.5 text-slate-500" />
+              <span>Desktop: <strong className="text-slate-900">{metrics.activeDesktopUsers}</strong></span>
             </div>
             <div className="flex items-center gap-1.5">
-              <Smartphone className="w-3.5 h-3.5 text-amber-400" />
-              <span>📱 Mobile: <strong className="text-amber-400">{metrics.activeMobileUsers}</strong></span>
+              <Smartphone className="w-3.5 h-3.5 text-slate-500" />
+              <span>Mobile: <strong className="text-slate-900">{metrics.activeMobileUsers}</strong></span>
             </div>
             <div className="flex items-center gap-1.5">
-              <Eye className="w-3.5 h-3.5 text-purple-400" />
-              <span>👁 Currently Viewing: <strong className="text-purple-400">{metrics.currentlyViewing}</strong></span>
+              <Eye className="w-3.5 h-3.5 text-slate-500" />
+              <span>Viewing: <strong className="text-slate-900">{metrics.currentlyViewing}</strong></span>
             </div>
             <div className="flex items-center gap-1.5">
-              <Clock className="w-3.5 h-3.5 text-cyan-300" />
-              <span>⏱ Avg Active: <strong className="text-white">{formatDuration(metrics.avgActiveTimeSeconds)}</strong></span>
+              <Clock className="w-3.5 h-3.5 text-slate-500" />
+              <span>Avg Active: <strong className="text-slate-900">{formatDuration(metrics.avgActiveTimeSeconds)}</strong></span>
             </div>
           </div>
 
-          <div className="text-[11px] text-slate-400">
-            Last Updated: <span className="text-cyan-400 font-bold">{metrics.lastUpdatedIST}</span>
+          <div className="text-[11px] text-slate-500">
+            Last Synced: <span className="text-slate-700 font-semibold">{metrics.lastUpdatedIST}</span>
           </div>
         </div>
       </GlassCard>
 
-      {/* LARGE ANIMATED METRIC CARDS GRID */}
+      {/* METRIC CARDS GRID */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         {metricCards.map((card, idx) => {
           const Icon = card.icon;
@@ -136,20 +136,20 @@ export const DashboardPage: React.FC = () => {
             <GlassCard
               key={idx}
               variant="default"
-              className={`p-4 flex flex-col justify-between h-36 border ${card.border} hover:border-cyan-400/60 hover:scale-[1.02] transition-all cursor-pointer group`}
+              className="p-4 flex flex-col justify-between h-36 bg-white border border-slate-200 hover:border-slate-300 transition-all cursor-pointer group shadow-2xs"
             >
               <div className="flex items-start justify-between">
-                <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">{card.title}</span>
-                <div className={`p-2 rounded-xl bg-slate-950 border border-slate-800 ${card.color} group-hover:scale-110 transition-transform`}>
+                <span className="text-xs font-semibold text-slate-500 uppercase tracking-wide">{card.title}</span>
+                <div className="p-2 rounded-lg bg-slate-100 border border-slate-200 text-slate-700 group-hover:bg-slate-200 transition-colors">
                   <Icon className="w-4 h-4" />
                 </div>
               </div>
 
               <div className="mt-2 flex items-baseline justify-between">
-                <div className="text-2xl font-black text-white tracking-tight">
+                <div className="text-2xl font-bold text-slate-900 tracking-tight">
                   <AnimatedCounter value={card.value} suffix={card.suffix || ''} decimals={card.decimals || 0} />
                 </div>
-                <div className="flex items-center gap-1 text-[11px] font-bold text-emerald-400 bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-500/30">
+                <div className="flex items-center gap-1 text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
                   <TrendingUp className="w-3 h-3" />
                   <span>{card.growth}</span>
                 </div>
@@ -162,52 +162,52 @@ export const DashboardPage: React.FC = () => {
       {/* QUICK INSIGHTS CARDS */}
       <div>
         <div className="flex items-center gap-2 mb-3">
-          <Sparkles className="w-4 h-4 text-cyan-400" />
-          <h2 className="text-xs font-bold text-white uppercase tracking-widest">AUTOMATED QUICK INSIGHTS</h2>
+          <Sparkles className="w-4 h-4 text-slate-700" />
+          <h2 className="text-xs font-bold text-slate-800 uppercase tracking-wider">Automated Insights</h2>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {quickInsights.map(insight => (
-            <GlassCard key={insight.id} variant="glow" className="p-4 border-l-4 border-l-cyan-400 flex items-start gap-3">
-              <div className="p-2 rounded-xl bg-cyan-500/10 text-cyan-400 shrink-0">
+            <GlassCard key={insight.id} variant="default" className="p-4 border-l-4 border-l-slate-900 flex items-start gap-3 bg-white border-slate-200">
+              <div className="p-2 rounded-lg bg-slate-100 text-slate-800 shrink-0">
                 <Sparkles className="w-4 h-4" />
               </div>
               <div>
-                <h3 className="text-xs font-bold text-white uppercase">{insight.title}</h3>
-                <p className="text-xs text-slate-300 mt-1 leading-relaxed">{insight.summary}</p>
+                <h3 className="text-xs font-bold text-slate-900">{insight.title}</h3>
+                <p className="text-xs text-slate-600 mt-1 leading-relaxed">{insight.summary}</p>
               </div>
             </GlassCard>
           ))}
         </div>
       </div>
 
-      {/* MAIN GRID: RECENT ACTIVITY TIMELINE & REGISTRATION OVERVIEW */}
+      {/* MAIN GRID: RECENT ACTIVITY & REGISTRATION OVERVIEW */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* RECENT ACTIVITY TIMELINE */}
-        <GlassCard variant="default" className="p-5 flex flex-col justify-between">
-          <div className="border-b border-cyan-500/20 pb-3 mb-4 flex items-center justify-between">
-            <h2 className="text-xs font-bold text-white uppercase flex items-center gap-2">
-              <Activity className="w-4 h-4 text-cyan-400" /> RECENT ACTIVITY TIMELINE
+        <GlassCard variant="default" className="p-5 flex flex-col justify-between bg-white border-slate-200">
+          <div className="border-b border-slate-100 pb-3 mb-4 flex items-center justify-between">
+            <h2 className="text-xs font-bold text-slate-900 uppercase flex items-center gap-2">
+              <Activity className="w-4 h-4 text-slate-700" /> Recent Activity Stream
             </h2>
-            <span className="text-[10px] text-emerald-400 font-bold">REALTIME STREAM</span>
+            <span className="text-[10px] text-emerald-700 font-semibold bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">Live</span>
           </div>
 
-          <div className="space-y-3 overflow-y-auto max-h-[380px] pr-1">
+          <div className="space-y-2.5 overflow-y-auto max-h-[380px] pr-1">
             {activities.length === 0 ? (
-              <div className="p-8 text-center text-slate-500 text-xs">
+              <div className="p-8 text-center text-slate-400 text-xs">
                 No recent activity logged in Firestore.
               </div>
             ) : (
               activities.slice(0, 10).map((act) => (
-                <div key={act.id} className="p-3 rounded-xl bg-slate-950/80 border border-slate-800 flex items-start gap-3 text-xs">
-                  <div className="p-2 rounded-lg bg-cyan-500/10 text-cyan-400 shrink-0 mt-0.5">
+                <div key={act.id} className="p-3 rounded-lg bg-slate-50 border border-slate-200/80 flex items-start gap-3 text-xs">
+                  <div className="p-1.5 rounded-md bg-white border border-slate-200 text-slate-700 shrink-0 mt-0.5">
                     <Activity className="w-3.5 h-3.5" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between gap-2">
-                      <span className="font-bold text-white truncate">{act.title}</span>
+                      <span className="font-semibold text-slate-900 truncate">{act.title}</span>
                       <span className="text-[10px] text-slate-500 shrink-0">{formatISTDateTime(act.timestamp).split(',')[1]}</span>
                     </div>
-                    <p className="text-[11px] text-slate-400 mt-0.5 line-clamp-2">{act.description}</p>
+                    <p className="text-[11px] text-slate-600 mt-0.5 line-clamp-2">{act.description}</p>
                   </div>
                 </div>
               ))
@@ -216,136 +216,136 @@ export const DashboardPage: React.FC = () => {
         </GlassCard>
 
         {/* REGISTRATION OVERVIEW WIDGET */}
-        <GlassCard variant="default" className="lg:col-span-2 p-5 flex flex-col justify-between">
-          <div className="border-b border-cyan-500/20 pb-3 mb-4 flex items-center justify-between">
-            <h2 className="text-xs font-bold text-white uppercase flex items-center gap-2">
-              <Layers className="w-4 h-4 text-amber-400" /> REGISTRATION OVERVIEW
+        <GlassCard variant="default" className="lg:col-span-2 p-5 flex flex-col justify-between bg-white border-slate-200">
+          <div className="border-b border-slate-100 pb-3 mb-4 flex items-center justify-between">
+            <h2 className="text-xs font-bold text-slate-900 uppercase flex items-center gap-2">
+              <Layers className="w-4 h-4 text-slate-700" /> Registration Overview
             </h2>
-            <span className="text-[10px] text-slate-400 uppercase font-bold">YODHA STATS</span>
+            <span className="text-[10px] text-slate-500 uppercase font-semibold">YODHA 2.0</span>
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-4">
-            <div className="p-3 rounded-xl bg-slate-950 border border-slate-800">
-              <div className="text-[10px] text-slate-400 uppercase font-bold">Healthcare Teams</div>
-              <div className="text-xl font-black text-pink-400 mt-1">{metrics.healthcareTeams}</div>
+            <div className="p-3 rounded-lg bg-slate-50 border border-slate-200">
+              <div className="text-[10px] text-slate-500 uppercase font-semibold">Healthcare Teams</div>
+              <div className="text-xl font-bold text-slate-900 mt-1">{metrics.healthcareTeams}</div>
             </div>
-            <div className="p-3 rounded-xl bg-slate-950 border border-slate-800">
-              <div className="text-[10px] text-slate-400 uppercase font-bold">Environment Teams</div>
-              <div className="text-xl font-black text-emerald-400 mt-1">{metrics.environmentTeams}</div>
+            <div className="p-3 rounded-lg bg-slate-50 border border-slate-200">
+              <div className="text-[10px] text-slate-500 uppercase font-semibold">Environment Teams</div>
+              <div className="text-xl font-bold text-slate-900 mt-1">{metrics.environmentTeams}</div>
             </div>
-            <div className="p-3 rounded-xl bg-slate-950 border border-slate-800">
-              <div className="text-[10px] text-slate-400 uppercase font-bold">Total Teams</div>
-              <div className="text-xl font-black text-cyan-400 mt-1">{metrics.totalTeams}</div>
+            <div className="p-3 rounded-lg bg-slate-50 border border-slate-200">
+              <div className="text-[10px] text-slate-500 uppercase font-semibold">Total Teams</div>
+              <div className="text-xl font-bold text-slate-900 mt-1">{metrics.totalTeams}</div>
             </div>
-            <div className="p-3 rounded-xl bg-slate-950 border border-slate-800">
-              <div className="text-[10px] text-slate-400 uppercase font-bold">Total Participants</div>
-              <div className="text-xl font-black text-amber-400 mt-1">{metrics.totalParticipants}</div>
+            <div className="p-3 rounded-lg bg-slate-50 border border-slate-200">
+              <div className="text-[10px] text-slate-500 uppercase font-semibold">Total Participants</div>
+              <div className="text-xl font-bold text-slate-900 mt-1">{metrics.totalParticipants}</div>
             </div>
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-            <div className="p-3 rounded-xl bg-slate-950 border border-slate-800">
-              <div className="text-[10px] text-slate-400 uppercase font-bold">Average Team Size</div>
-              <div className="text-xl font-black text-purple-400 mt-1">{metrics.avgTeamSize}</div>
+            <div className="p-3 rounded-lg bg-slate-50 border border-slate-200">
+              <div className="text-[10px] text-slate-500 uppercase font-semibold">Average Team Size</div>
+              <div className="text-xl font-bold text-slate-900 mt-1">{metrics.avgTeamSize}</div>
             </div>
-            <div className="p-3 rounded-xl bg-slate-950 border border-slate-800">
-              <div className="text-[10px] text-slate-400 uppercase font-bold">Largest Team</div>
-              <div className="text-xl font-black text-cyan-300 mt-1">{metrics.largestTeamSize} Members</div>
+            <div className="p-3 rounded-lg bg-slate-50 border border-slate-200">
+              <div className="text-[10px] text-slate-500 uppercase font-semibold">Largest Team</div>
+              <div className="text-xl font-bold text-slate-900 mt-1">{metrics.largestTeamSize} Members</div>
             </div>
-            <div className="p-3 rounded-xl bg-slate-950 border border-slate-800">
-              <div className="text-[10px] text-slate-400 uppercase font-bold">Today's Registrations</div>
-              <div className="text-xl font-black text-emerald-400 mt-1">{metrics.todayRegistrations}</div>
+            <div className="p-3 rounded-lg bg-slate-50 border border-slate-200">
+              <div className="text-[10px] text-slate-500 uppercase font-semibold">Today's Registrations</div>
+              <div className="text-xl font-bold text-slate-900 mt-1">{metrics.todayRegistrations}</div>
             </div>
-            <div className="p-3 rounded-xl bg-slate-950 border border-slate-800">
-              <div className="text-[10px] text-slate-400 uppercase font-bold">This Week</div>
-              <div className="text-xl font-black text-amber-400 mt-1">{metrics.registrationsThisWeek}</div>
+            <div className="p-3 rounded-lg bg-slate-50 border border-slate-200">
+              <div className="text-[10px] text-slate-500 uppercase font-semibold">This Week</div>
+              <div className="text-xl font-bold text-slate-900 mt-1">{metrics.registrationsThisWeek}</div>
             </div>
           </div>
         </GlassCard>
       </div>
 
-      {/* REGISTRATION TABLE WITH SEARCH, PAGINATION & DRAWER */}
-      <GlassCard variant="default" className="p-5 overflow-hidden">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-cyan-500/20 pb-4 mb-4">
+      {/* REGISTRATION TABLE WITH SEARCH & PAGINATION */}
+      <GlassCard variant="default" className="p-5 overflow-hidden bg-white border-slate-200">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 pb-4 mb-4">
           <div>
-            <h2 className="text-xs font-bold text-white uppercase flex items-center gap-2">
-              <Users className="w-4 h-4 text-cyan-400" /> REGISTRATION RESPONSES TABLE ({filteredTeams.length})
+            <h2 className="text-xs font-bold text-slate-900 uppercase flex items-center gap-2">
+              <Users className="w-4 h-4 text-slate-700" /> Registration Responses ({filteredTeams.length})
             </h2>
-            <p className="text-[11px] text-slate-400 mt-0.5">SEARCH, VIEW PROFILE DRAWER, EDIT, DELETE & EXPORT RESPONSES</p>
+            <p className="text-xs text-slate-500 mt-0.5">Search, view team profile, edit, delete & export responses</p>
           </div>
 
           <div className="flex items-center gap-3">
             <div className="relative">
-              <Search className="w-3.5 h-3.5 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
+              <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={e => { setSearchQuery(e.target.value); setCurrentPage(1); }}
                 placeholder="Search Team, Leader, College, Track..."
-                className="pl-8 pr-3 py-1.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-slate-200 focus:border-cyan-500 outline-none w-64 font-mono"
+                className="pl-8 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-800 focus:border-slate-400 focus:bg-white outline-none w-64 font-sans"
               />
             </div>
           </div>
         </div>
 
         {paginatedTeams.length === 0 ? (
-          <div className="p-12 text-center text-slate-500 text-xs font-mono">
+          <div className="p-12 text-center text-slate-400 text-xs font-sans">
             No registration records found in Firestore.
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs font-mono">
-              <thead className="bg-slate-950/80 text-cyan-400 uppercase border-b border-cyan-500/20">
+            <table className="w-full text-left text-xs font-sans">
+              <thead className="bg-slate-50 text-slate-600 uppercase text-[11px] font-semibold border-b border-slate-200">
                 <tr>
                   <th className="p-3">Team Name</th>
                   <th className="p-3">Leader</th>
                   <th className="p-3">College</th>
                   <th className="p-3">Track</th>
                   <th className="p-3">Members</th>
-                  <th className="p-3">Date (IST)</th>
+                  <th className="p-3">Registered (IST)</th>
                   <th className="p-3 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-800/60 text-slate-300">
+              <tbody className="divide-y divide-slate-100 text-slate-700">
                 {paginatedTeams.map((team) => (
-                  <tr key={team.id} className="hover:bg-slate-900/60 transition-colors">
-                    <td className="p-3 font-bold text-white">{team.name}</td>
-                    <td className="p-3 font-medium text-slate-200">{team.leaderName}</td>
-                    <td className="p-3 text-slate-300">{team.college}</td>
+                  <tr key={team.id} className="hover:bg-slate-50/80 transition-colors">
+                    <td className="p-3 font-semibold text-slate-900">{team.name}</td>
+                    <td className="p-3 font-medium text-slate-800">{team.leaderName}</td>
+                    <td className="p-3 text-slate-600">{team.college}</td>
                     <td className="p-3">
-                      <span className="px-2 py-0.5 rounded text-[10px] bg-cyan-950 text-cyan-300 border border-cyan-500/30">
+                      <span className="px-2 py-0.5 rounded text-[11px] font-medium bg-slate-100 text-slate-700 border border-slate-200">
                         {team.track}
                       </span>
                     </td>
-                    <td className="p-3 font-bold text-slate-200">{team.members.length}</td>
-                    <td className="p-3 text-slate-400 text-[11px]">{formatISTDateTime(team.createdAt)}</td>
+                    <td className="p-3 font-semibold text-slate-800">{team.members.length}</td>
+                    <td className="p-3 text-slate-500 text-[11px]">{formatISTDateTime(team.createdAt)}</td>
                     <td className="p-3 text-right">
                       <div className="flex items-center justify-end gap-1.5">
                         <button
                           onClick={() => setSelectedTeam(team)}
                           title="View Full Profile Drawer"
-                          className="px-2.5 py-1 rounded-lg bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/20 text-[11px] font-bold flex items-center gap-1"
+                          className="px-2.5 py-1 rounded-md bg-slate-100 border border-slate-200 text-slate-700 hover:bg-slate-200 text-[11px] font-semibold flex items-center gap-1 cursor-pointer"
                         >
                           <Eye className="w-3.5 h-3.5" /> View
                         </button>
                         <button
                           onClick={() => handleEditClick(team)}
                           title="Edit Team Response"
-                          className="p-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20"
+                          className="p-1.5 rounded-md bg-slate-100 border border-slate-200 text-slate-700 hover:bg-slate-200 cursor-pointer"
                         >
                           <Edit3 className="w-3.5 h-3.5" />
                         </button>
                         <button
                           onClick={() => exportTeamPDF(team)}
                           title="Export Team PDF"
-                          className="p-1.5 rounded-lg bg-slate-900 border border-slate-800 text-slate-300 hover:text-white"
+                          className="p-1.5 rounded-md bg-slate-100 border border-slate-200 text-slate-700 hover:bg-slate-200 cursor-pointer"
                         >
                           <Download className="w-3.5 h-3.5" />
                         </button>
                         <button
                           onClick={() => handleDeleteClick(team)}
                           title="Delete Response from Firestore"
-                          className="p-1.5 rounded-lg bg-pink-500/10 border border-pink-500/30 text-pink-400 hover:bg-pink-500/20"
+                          className="p-1.5 rounded-md bg-rose-50 border border-rose-200 text-rose-600 hover:bg-rose-100 cursor-pointer"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
                         </button>
@@ -360,22 +360,22 @@ export const DashboardPage: React.FC = () => {
 
         {/* Pagination Footer */}
         {totalPages > 1 && (
-          <div className="flex items-center justify-between pt-4 mt-2 border-t border-slate-800 text-xs">
-            <span className="text-slate-400">
+          <div className="flex items-center justify-between pt-4 mt-2 border-t border-slate-100 text-xs">
+            <span className="text-slate-500">
               Showing page {currentPage} of {totalPages}
             </span>
             <div className="flex items-center gap-2">
               <button
                 disabled={currentPage === 1}
                 onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-                className="p-1.5 rounded-lg bg-slate-900 border border-slate-800 text-slate-300 disabled:opacity-40"
+                className="p-1.5 rounded-md bg-slate-100 border border-slate-200 text-slate-700 disabled:opacity-40 cursor-pointer"
               >
                 <ChevronLeft className="w-4 h-4" />
               </button>
               <button
                 disabled={currentPage === totalPages}
                 onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-                className="p-1.5 rounded-lg bg-slate-900 border border-slate-800 text-slate-300 disabled:opacity-40"
+                className="p-1.5 rounded-md bg-slate-100 border border-slate-200 text-slate-700 disabled:opacity-40 cursor-pointer"
               >
                 <ChevronRight className="w-4 h-4" />
               </button>

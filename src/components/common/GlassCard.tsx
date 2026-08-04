@@ -26,15 +26,9 @@ export const GlassCard: React.FC<GlassCardProps> = ({
 
   return (
     <motion.div
-      whileHover={hoverEffect ? { y: -3, transition: { duration: 0.2 } } : undefined}
-      className={`rounded-2xl p-5 relative overflow-hidden transition-all duration-300 ${getVariantClass()} ${className}`}
+      whileHover={hoverEffect ? { y: -2, transition: { duration: 0.15 } } : undefined}
+      className={`rounded-xl p-5 relative overflow-hidden transition-all duration-200 ${getVariantClass()} ${className}`}
     >
-      {/* Corner accent decorations */}
-      <div className="absolute top-0 left-0 w-2 h-2 border-t-2 border-l-2 border-cyan-400/40 pointer-events-none" />
-      <div className="absolute top-0 right-0 w-2 h-2 border-t-2 border-r-2 border-cyan-400/40 pointer-events-none" />
-      <div className="absolute bottom-0 left-0 w-2 h-2 border-b-2 border-l-2 border-cyan-400/40 pointer-events-none" />
-      <div className="absolute bottom-0 right-0 w-2 h-2 border-b-2 border-r-2 border-cyan-400/40 pointer-events-none" />
-
       {children}
     </motion.div>
   );

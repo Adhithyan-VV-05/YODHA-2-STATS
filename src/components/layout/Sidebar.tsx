@@ -32,12 +32,12 @@ export const Sidebar: React.FC = () => {
 
   return (
     <aside
-      className={`h-[calc(100vh-4rem)] bg-slate-950/90 border-r border-cyan-500/15 backdrop-blur-xl flex flex-col transition-all duration-300 relative z-30 font-mono ${
-        isCollapsed ? 'w-20' : 'w-64'
+      className={`h-[calc(100vh-4rem)] bg-white border-r border-slate-200 flex flex-col transition-all duration-300 relative z-30 font-sans ${
+        isCollapsed ? 'w-20' : 'w-60'
       }`}
     >
       {/* Navigation Items */}
-      <div className="flex-1 py-4 px-3 space-y-1.5 overflow-y-auto">
+      <div className="flex-1 py-4 px-3 space-y-1 overflow-y-auto">
         {navItems.map((item) => {
           const Icon = item.icon;
           return (
@@ -45,36 +45,31 @@ export const Sidebar: React.FC = () => {
               key={item.path}
               to={item.path}
               className={({ isActive }) =>
-                `flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs transition-all group relative ${
+                `flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-medium transition-all group relative ${
                   isActive
-                    ? 'bg-cyan-500/15 text-cyan-300 border border-cyan-500/30 shadow-lg shadow-cyan-500/10 font-bold'
-                    : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/60 hover:border-slate-800 border border-transparent'
+                    ? 'bg-slate-900 text-white font-semibold shadow-xs'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                 }`
               }
             >
               {({ isActive }) => (
                 <>
-                  <Icon className={`w-4 h-4 shrink-0 transition-transform group-hover:scale-110 ${isActive ? 'text-cyan-400' : 'text-slate-500 group-hover:text-cyan-400'}`} />
+                  <Icon className={`w-4 h-4 shrink-0 transition-transform ${isActive ? 'text-white' : 'text-slate-400 group-hover:text-slate-700'}`} />
                   
                   {!isCollapsed && (
-                    <span className="flex-1 truncate tracking-wide">{item.label}</span>
+                    <span className="flex-1 truncate">{item.label}</span>
                   )}
 
                   {!isCollapsed && item.badge !== null && (
                     <span
-                      className={`px-1.5 py-0.5 rounded-md text-[10px] font-bold ${
+                      className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${
                         isActive
-                          ? 'bg-cyan-400 text-slate-950'
-                          : 'bg-slate-900 text-cyan-400 border border-slate-800'
+                          ? 'bg-white/20 text-white'
+                          : 'bg-slate-100 text-slate-700 border border-slate-200'
                       }`}
                     >
                       {item.badge}
                     </span>
-                  )}
-
-                  {/* Active glowing indicator */}
-                  {isActive && (
-                    <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 rounded-r-full bg-cyan-400 shadow-glow shadow-cyan-400" />
                   )}
                 </>
               )}
@@ -83,17 +78,17 @@ export const Sidebar: React.FC = () => {
         })}
       </div>
 
-      {/* Collapse Toggle & Security Badge */}
-      <div className="p-3 border-t border-cyan-500/15 flex items-center justify-between">
+      {/* Collapse Toggle & Security Status */}
+      <div className="p-3 border-t border-slate-200 flex items-center justify-between bg-slate-50/50">
         {!isCollapsed && (
-          <div className="flex items-center gap-2 text-[11px] text-slate-400">
-            <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-            <span>{isAdminAuthenticated ? 'ADMIN AUTHENTICATED' : 'READ-ONLY MODE'}</span>
+          <div className="flex items-center gap-2 text-[11px] font-medium text-slate-600">
+            <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+            <span>{isAdminAuthenticated ? 'Admin Authenticated' : 'Read-Only Mode'}</span>
           </div>
         )}
         <button
           onClick={() => setIsCollapsed(!isCollapsed)}
-          className="p-2 rounded-xl bg-slate-900 border border-slate-800 hover:border-cyan-500/40 text-slate-400 hover:text-cyan-300 transition-all ml-auto"
+          className="p-1.5 rounded-lg bg-white border border-slate-200 hover:bg-slate-100 text-slate-500 hover:text-slate-800 transition-all ml-auto cursor-pointer"
         >
           {isCollapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
         </button>

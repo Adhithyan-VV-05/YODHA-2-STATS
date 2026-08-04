@@ -28,7 +28,7 @@ function AppContent() {
 
   return (
     <Router>
-      <div className="min-h-screen bg-[#06080d] text-slate-100 bg-grid-cyber flex flex-col font-mono selection:bg-cyan-500 selection:text-slate-950">
+      <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans selection:bg-slate-900 selection:text-white">
         {/* Top Bar Header */}
         <TopBar />
 

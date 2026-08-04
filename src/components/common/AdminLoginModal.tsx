@@ -30,32 +30,32 @@ export const AdminLoginModal: React.FC = () => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm font-mono">
-      <div className="w-full max-w-md bg-slate-900 border border-cyan-500/30 rounded-2xl p-6 shadow-2xl relative">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs font-sans">
+      <div className="w-full max-w-md bg-white border border-slate-200 rounded-xl p-6 shadow-xl relative">
         <button
           onClick={closeLoginModal}
-          className="absolute top-4 right-4 text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800"
+          className="absolute top-4 right-4 text-slate-400 hover:text-slate-700 p-1 rounded-lg hover:bg-slate-100 cursor-pointer"
         >
           <X className="w-5 h-5" />
         </button>
 
-        <div className="flex items-center gap-3 border-b border-cyan-500/20 pb-4 mb-5">
-          <div className="p-2.5 rounded-xl bg-cyan-500/10 border border-cyan-500/30 text-cyan-400">
+        <div className="flex items-center gap-3 border-b border-slate-100 pb-4 mb-5">
+          <div className="p-2.5 rounded-lg bg-slate-100 text-slate-800">
             <ShieldCheck className="w-6 h-6" />
           </div>
           <div>
-            <h2 className="text-base font-bold text-white tracking-wide uppercase">ADMIN AUTHENTICATION</h2>
-            <p className="text-xs text-slate-400">Verifies against passcode stored in Firestore</p>
+            <h2 className="text-base font-bold text-slate-900 tracking-tight">Admin Authentication</h2>
+            <p className="text-xs text-slate-500">Verified via Firestore admin configuration</p>
           </div>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-xs font-bold text-slate-300 mb-1.5 uppercase">
+            <label className="block text-xs font-semibold text-slate-700 mb-1.5 uppercase tracking-wide">
               Admin Passcode
             </label>
             <div className="relative">
-              <Lock className="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
+              <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
               <input
                 type="password"
                 value={passcode}
@@ -65,31 +65,31 @@ export const AdminLoginModal: React.FC = () => {
                 }}
                 placeholder="Enter passcode..."
                 autoFocus
-                className="w-full pl-9 pr-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-slate-100 text-sm focus:border-cyan-500 outline-none font-mono"
+                className="w-full pl-9 pr-4 py-2 rounded-lg bg-slate-50 border border-slate-200 text-slate-900 text-sm focus:border-slate-400 focus:bg-white outline-none font-sans"
               />
             </div>
             {error && (
-              <div className="flex items-center gap-1.5 mt-2 text-xs text-rose-400">
+              <div className="flex items-center gap-1.5 mt-2 text-xs text-rose-600 font-medium">
                 <AlertCircle className="w-3.5 h-3.5" />
                 <span>{error}</span>
               </div>
             )}
             <p className="text-[11px] text-slate-500 mt-2">
-              Passcode verified securely against Firestore <code className="text-slate-400">stats/admin_config</code> document.
+              Passcode is verified securely against Firestore database.
             </p>
           </div>
 
-          <div className="flex items-center justify-end gap-3 pt-2">
+          <div className="flex items-center justify-end gap-2 pt-2">
             <button
               type="button"
               onClick={closeLoginModal}
-              className="px-4 py-2 rounded-xl bg-slate-800 text-slate-300 text-xs font-bold hover:bg-slate-700"
+              className="px-4 py-2 rounded-lg bg-slate-100 text-slate-700 text-xs font-semibold hover:bg-slate-200 cursor-pointer"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="px-5 py-2 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 text-slate-950 font-black text-xs hover:opacity-90 transition-opacity"
+              className="px-5 py-2 rounded-lg bg-slate-900 text-white font-semibold text-xs hover:bg-slate-800 transition-all shadow-xs cursor-pointer"
             >
               Authenticate Admin
             </button>

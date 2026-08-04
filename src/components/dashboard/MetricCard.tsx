@@ -29,37 +29,32 @@ export const MetricCard: React.FC<MetricCardProps> = ({
   growthLabel = 'vs last period',
   sparklineData = [12, 18, 14, 28, 22, 35, 42],
   icon: Icon,
-  color = '#00f3ff',
+  color: _color = '#0f172a',
   variant = 'default'
 }) => {
   const isPositive = growth >= 0;
 
   return (
-    <GlassCard variant={variant} className="flex flex-col justify-between h-40">
+    <GlassCard variant={variant} className="flex flex-col justify-between h-36 border border-slate-200 bg-white">
       {/* Top Header */}
       <div className="flex items-start justify-between">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2.5">
           <div
-            className="w-9 h-9 rounded-xl flex items-center justify-center border"
-            style={{
-              backgroundColor: `${color}12`,
-              borderColor: `${color}30`,
-              color
-            }}
+            className="w-9 h-9 rounded-lg flex items-center justify-center bg-slate-100 border border-slate-200 text-slate-700"
           >
             <Icon className="w-4 h-4" />
           </div>
           <div>
-            <h3 className="text-xs font-mono font-medium text-slate-400 uppercase tracking-wider">{title}</h3>
+            <h3 className="text-xs font-sans font-medium text-slate-500 uppercase tracking-wide">{title}</h3>
           </div>
         </div>
 
         {/* Growth % Pill */}
         <div
-          className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-mono font-bold ${
+          className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-sans font-semibold ${
             isPositive
-              ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30'
-              : 'bg-pink-500/10 text-pink-400 border border-pink-500/30'
+              ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+              : 'bg-rose-50 text-rose-700 border border-rose-200'
           }`}
         >
           {isPositive ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
@@ -68,17 +63,17 @@ export const MetricCard: React.FC<MetricCardProps> = ({
       </div>
 
       {/* Center Animated Counter */}
-      <div className="my-2 flex items-baseline justify-between">
+      <div className="my-1 flex items-baseline justify-between">
         <div>
-          <div className="text-2xl font-mono font-black text-white tracking-tight">
+          <div className="text-2xl font-sans font-bold text-slate-900 tracking-tight">
             <AnimatedCounter value={value} prefix={prefix} suffix={suffix} decimals={decimals} />
           </div>
-          <div className="text-[10px] font-mono text-slate-500">{growthLabel}</div>
+          <div className="text-[11px] font-sans text-slate-500">{growthLabel}</div>
         </div>
 
         {/* Sparkline */}
         <div className="shrink-0 pt-1">
-          <Sparkline data={sparklineData} color={color} width={84} height={32} />
+          <Sparkline data={sparklineData} color="#64748b" width={84} height={32} />
         </div>
       </div>
     </GlassCard>

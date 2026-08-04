@@ -20,22 +20,22 @@ export const ExportsPage: React.FC = () => {
   const handleExportPDF = () => {
     const doc = new jsPDF();
 
-    // Dark Header
-    doc.setFillColor(6, 8, 13);
+    // Clean Light Header
+    doc.setFillColor(15, 23, 42);
     doc.rect(0, 0, 210, 45, 'F');
 
-    doc.setTextColor(0, 243, 255);
-    doc.setFontSize(20);
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(18);
     doc.setFont('helvetica', 'bold');
-    doc.text('YODHA COMMAND CENTER', 14, 20);
+    doc.text('YODHA 2.0 Dashboard', 14, 20);
 
-    doc.setTextColor(200, 200, 220);
+    doc.setTextColor(203, 213, 225);
     doc.setFontSize(10);
-    doc.text(`OFFICIAL EXECUTIVE HACKATHON DOSSIER REPORT`, 14, 28);
+    doc.text(`Official Executive Hackathon Report`, 14, 28);
     doc.text(`Generated: ${new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })} IST`, 14, 36);
 
     // Summary Section
-    doc.setTextColor(20, 20, 30);
+    doc.setTextColor(15, 23, 42);
     doc.setFontSize(12);
     doc.text('SUMMARY METRICS', 14, 55);
 
@@ -52,139 +52,139 @@ export const ExportsPage: React.FC = () => {
       t.leaderName,
       t.college,
       t.track,
-      `${t.members.length} Mbrs`
+      `${t.members.length} Members`
     ]);
 
     autoTable(doc, {
       startY: 90,
       head: [['#', 'Team Name', 'Leader', 'College', 'Track', 'Members']],
       body: tableData,
-      headStyles: { fillColor: [13, 17, 26], textColor: [0, 243, 255] }
+      headStyles: { fillColor: [15, 23, 42], textColor: [255, 255, 255] }
     });
 
     doc.save(`YODHA_Executive_Hackathon_Report.pdf`);
   };
 
   return (
-    <div className="space-y-6 pb-12 font-mono">
+    <div className="space-y-6 pb-12 font-sans">
       {/* HEADER */}
-      <div className="border-b border-cyan-500/20 pb-4">
-        <h1 className="text-xl font-black text-white tracking-widest uppercase flex items-center gap-2">
-          <Download className="w-5 h-5 text-cyan-400" /> MULTI-FORMAT DATA EXPORT HUB
+      <div className="border-b border-slate-200 pb-4">
+        <h1 className="text-xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
+          <Download className="w-5 h-5 text-slate-700" /> Data Export Hub
         </h1>
-        <p className="text-xs text-slate-400 mt-1">
-          EXPORT REAL FIRESTORE DATASETS IN CSV, EXCEL, PDF DOSSIER AND JSON FORMATS
+        <p className="text-xs text-slate-500 mt-0.5">
+          Export Firestore registration data in CSV, Excel, PDF, and JSON formats
         </p>
       </div>
 
       {/* EXPORT OPTIONS CARDS */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {/* CSV EXPORT */}
-        <GlassCard variant="glow" className="p-5 flex flex-col justify-between h-56 border-cyan-500/30">
+        <GlassCard variant="default" className="p-5 flex flex-col justify-between h-56 bg-white border-slate-200 shadow-2xs">
           <div>
-            <div className="flex items-center justify-between border-b border-slate-800 pb-3 mb-3">
-              <span className="text-[10px] text-cyan-400 font-bold uppercase tracking-wider">CSV Format</span>
-              <Download className="w-5 h-5 text-cyan-400" />
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3 mb-3">
+              <span className="text-[11px] text-slate-500 font-semibold uppercase tracking-wide">CSV Format</span>
+              <Download className="w-5 h-5 text-slate-700" />
             </div>
-            <h3 className="text-base font-bold text-white">Export CSV Dataset</h3>
-            <p className="text-xs text-slate-300 mt-2 leading-relaxed">
-              Full tab-separated registration records suitable for data analysis.
+            <h3 className="text-base font-bold text-slate-900">Export CSV Dataset</h3>
+            <p className="text-xs text-slate-500 mt-2 leading-relaxed">
+              Tabular registration records suitable for analytics spreadsheets.
             </p>
           </div>
           <button
             onClick={() => exportTeamsToCSV(teams)}
-            className="w-full py-2 rounded-xl bg-cyan-500/20 border border-cyan-500/40 text-cyan-300 font-bold hover:bg-cyan-500/30 text-xs transition-all flex items-center justify-center gap-2"
+            className="w-full py-2.5 rounded-lg bg-slate-900 text-white font-semibold text-xs hover:bg-slate-800 transition-all flex items-center justify-center gap-2 cursor-pointer shadow-2xs"
           >
-            <Download className="w-4 h-4" /> Download CSV ({teams.length} Teams)
+            <Download className="w-4 h-4 text-slate-300" /> Download CSV ({teams.length} Teams)
           </button>
         </GlassCard>
 
         {/* EXCEL EXPORT */}
-        <GlassCard variant="glow" className="p-5 flex flex-col justify-between h-56 border-emerald-500/30">
+        <GlassCard variant="default" className="p-5 flex flex-col justify-between h-56 bg-white border-slate-200 shadow-2xs">
           <div>
-            <div className="flex items-center justify-between border-b border-slate-800 pb-3 mb-3">
-              <span className="text-[10px] text-emerald-400 font-bold uppercase tracking-wider">Excel Workbook</span>
-              <FileSpreadsheet className="w-5 h-5 text-emerald-400" />
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3 mb-3">
+              <span className="text-[11px] text-slate-500 font-semibold uppercase tracking-wide">Excel Workbook</span>
+              <FileSpreadsheet className="w-5 h-5 text-emerald-600" />
             </div>
-            <h3 className="text-base font-bold text-white">Export Excel (.xlsx)</h3>
-            <p className="text-xs text-slate-300 mt-2 leading-relaxed">
+            <h3 className="text-base font-bold text-slate-900">Export Excel (.xlsx)</h3>
+            <p className="text-xs text-slate-500 mt-2 leading-relaxed">
               Spreadsheet containing team rosters, participant emails, and phone records.
             </p>
           </div>
           <button
             onClick={() => exportTeamsToExcel(teams)}
-            className="w-full py-2 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 font-bold hover:bg-emerald-500/30 text-xs transition-all flex items-center justify-center gap-2"
+            className="w-full py-2.5 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-800 font-semibold hover:bg-emerald-100 text-xs transition-all flex items-center justify-center gap-2 cursor-pointer"
           >
-            <FileSpreadsheet className="w-4 h-4" /> Download Excel Worksheets
+            <FileSpreadsheet className="w-4 h-4 text-emerald-600" /> Download Excel Worksheets
           </button>
         </GlassCard>
 
         {/* PDF EXPORT */}
-        <GlassCard variant="glow" className="p-5 flex flex-col justify-between h-56 border-purple-500/30">
+        <GlassCard variant="default" className="p-5 flex flex-col justify-between h-56 bg-white border-slate-200 shadow-2xs">
           <div>
-            <div className="flex items-center justify-between border-b border-slate-800 pb-3 mb-3">
-              <span className="text-[10px] text-purple-400 font-bold uppercase tracking-wider">Executive PDF</span>
-              <ShieldCheck className="w-5 h-5 text-purple-400" />
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3 mb-3">
+              <span className="text-[11px] text-slate-500 font-semibold uppercase tracking-wide">Executive PDF</span>
+              <ShieldCheck className="w-5 h-5 text-slate-700" />
             </div>
-            <h3 className="text-base font-bold text-white">Export Executive PDF</h3>
-            <p className="text-xs text-slate-300 mt-2 leading-relaxed">
-              Formatted executive dossier PDF summary for organizers and stakeholders.
+            <h3 className="text-base font-bold text-slate-900">Export Executive PDF</h3>
+            <p className="text-xs text-slate-500 mt-2 leading-relaxed">
+              Formatted PDF report for hackathon organizers and stakeholders.
             </p>
           </div>
           <button
             onClick={handleExportPDF}
-            className="w-full py-2 rounded-xl bg-purple-500/20 border border-purple-500/40 text-purple-300 font-bold hover:bg-purple-500/30 text-xs transition-all flex items-center justify-center gap-2"
+            className="w-full py-2.5 rounded-lg bg-slate-100 border border-slate-200 text-slate-800 font-semibold hover:bg-slate-200 text-xs transition-all flex items-center justify-center gap-2 cursor-pointer"
           >
-            <ShieldCheck className="w-4 h-4" /> Download Executive PDF
+            <ShieldCheck className="w-4 h-4 text-slate-700" /> Download Executive PDF
           </button>
         </GlassCard>
 
         {/* JSON EXPORT */}
-        <GlassCard variant="glow" className="p-5 flex flex-col justify-between h-56 border-amber-500/30">
+        <GlassCard variant="default" className="p-5 flex flex-col justify-between h-56 bg-white border-slate-200 shadow-2xs">
           <div>
-            <div className="flex items-center justify-between border-b border-slate-800 pb-3 mb-3">
-              <span className="text-[10px] text-amber-400 font-bold uppercase tracking-wider">JSON Payload</span>
-              <FileText className="w-5 h-5 text-amber-400" />
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3 mb-3">
+              <span className="text-[11px] text-slate-500 font-semibold uppercase tracking-wide">JSON Payload</span>
+              <FileText className="w-5 h-5 text-amber-600" />
             </div>
-            <h3 className="text-base font-bold text-white">Export Raw JSON</h3>
-            <p className="text-xs text-slate-300 mt-2 leading-relaxed">
-              Full structured JSON object representation of the Firestore database.
+            <h3 className="text-base font-bold text-slate-900">Export Raw JSON</h3>
+            <p className="text-xs text-slate-500 mt-2 leading-relaxed">
+              Structured JSON object representation of the Firestore database.
             </p>
           </div>
           <button
             onClick={() => exportTeamsToJSON(teams)}
-            className="w-full py-2 rounded-xl bg-amber-500/20 border border-amber-500/40 text-amber-300 font-bold hover:bg-amber-500/30 text-xs transition-all flex items-center justify-center gap-2"
+            className="w-full py-2.5 rounded-lg bg-amber-50 border border-amber-200 text-amber-800 font-semibold hover:bg-amber-100 text-xs transition-all flex items-center justify-center gap-2 cursor-pointer"
           >
-            <FileText className="w-4 h-4" /> Export JSON Objects
+            <FileText className="w-4 h-4 text-amber-600" /> Export JSON Objects
           </button>
         </GlassCard>
       </div>
 
       {/* DATASET SUMMARY */}
-      <GlassCard variant="default" className="p-6">
-        <h3 className="text-xs font-bold text-white uppercase tracking-widest border-b border-slate-800 pb-3 mb-4">
-          AVAILABLE FIRESTORE DATASETS FOR EXPORT
+      <GlassCard variant="default" className="p-6 bg-white border-slate-200 shadow-2xs">
+        <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wide border-b border-slate-100 pb-3 mb-4">
+          Available Datasets
         </h3>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
-          <div className="p-4 rounded-xl bg-slate-950 border border-slate-800 flex items-center gap-3">
-            <Users className="w-6 h-6 text-cyan-400" />
+          <div className="p-4 rounded-lg bg-slate-50 border border-slate-200 flex items-center gap-3">
+            <Users className="w-6 h-6 text-slate-700" />
             <div>
-              <div className="font-bold text-white">{teams.length} Teams Registered</div>
-              <div className="text-[11px] text-slate-400">{participants.length} Total Members</div>
+              <div className="font-bold text-slate-900">{teams.length} Teams Registered</div>
+              <div className="text-[11px] text-slate-500">{participants.length} Total Members</div>
             </div>
           </div>
-          <div className="p-4 rounded-xl bg-slate-950 border border-slate-800 flex items-center gap-3">
-            <GraduationCap className="w-6 h-6 text-amber-400" />
+          <div className="p-4 rounded-lg bg-slate-50 border border-slate-200 flex items-center gap-3">
+            <GraduationCap className="w-6 h-6 text-slate-700" />
             <div>
-              <div className="font-bold text-white">{collegeStats.length} Institutions</div>
-              <div className="text-[11px] text-slate-400">Ranked by volume</div>
+              <div className="font-bold text-slate-900">{collegeStats.length} Institutions</div>
+              <div className="text-[11px] text-slate-500">Ranked by volume</div>
             </div>
           </div>
-          <div className="p-4 rounded-xl bg-slate-950 border border-slate-800 flex items-center gap-3">
-            <Eye className="w-6 h-6 text-emerald-400" />
+          <div className="p-4 rounded-lg bg-slate-50 border border-slate-200 flex items-center gap-3">
+            <Eye className="w-6 h-6 text-slate-700" />
             <div>
-              <div className="font-bold text-white">{sessions.length} Visitor Sessions</div>
-              <div className="text-[11px] text-slate-400">user_sessions collection</div>
+              <div className="font-bold text-slate-900">{sessions.length} Visitor Sessions</div>
+              <div className="text-[11px] text-slate-500">user_sessions collection</div>
             </div>
           </div>
         </div>

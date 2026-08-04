@@ -67,37 +67,37 @@ export const ParticipantsPage: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6 pb-12 font-mono">
+    <div className="space-y-6 pb-12 font-sans">
       {/* HEADER */}
-      <div className="border-b border-cyan-500/20 pb-4">
-        <h1 className="text-xl font-black text-white tracking-widest uppercase flex items-center gap-2">
-          <UserCheck className="w-5 h-5 text-emerald-400" /> PARTICIPANT DIRECTORY CARDS
+      <div className="border-b border-slate-200 pb-4">
+        <h1 className="text-xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
+          <UserCheck className="w-5 h-5 text-slate-700" /> Participant Directory
         </h1>
-        <p className="text-xs text-slate-400 mt-1">
-          INSPECT AND MANAGE {participants.length} REGISTERED HACKATHON PARTICIPANTS (IST TIMESTAMPS)
+        <p className="text-xs text-slate-500 mt-0.5">
+          Inspect and manage {participants.length} registered hackathon participants
         </p>
       </div>
 
       {/* SEARCH & FILTERS */}
-      <GlassCard variant="default" className="p-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <GlassCard variant="default" className="p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white border-slate-200">
         <div className="flex-1 relative">
-          <Search className="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
+          <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
           <input
             type="text"
             value={search}
             onChange={e => { setSearch(e.target.value); setCurrentPage(1); }}
             placeholder="Search Participant Name, Email, College, Team..."
-            className="w-full pl-9 pr-4 py-2 rounded-xl bg-slate-950 border border-slate-800 text-slate-200 text-xs focus:border-emerald-500/50 outline-none"
+            className="w-full pl-9 pr-4 py-2 rounded-lg bg-slate-50 border border-slate-200 text-slate-800 text-xs focus:border-slate-400 focus:bg-white outline-none font-sans"
           />
         </div>
 
         <div className="flex items-center gap-3">
-          <div className="flex items-center gap-1.5 text-xs text-slate-400">
-            <Filter className="w-3.5 h-3.5 text-emerald-400" /> Track:
+          <div className="flex items-center gap-1.5 text-xs text-slate-500 font-medium">
+            <Filter className="w-3.5 h-3.5 text-slate-400" /> Track:
             <select
               value={trackFilter}
               onChange={e => { setTrackFilter(e.target.value); setCurrentPage(1); }}
-              className="bg-slate-950 border border-slate-800 text-slate-200 rounded-lg px-2.5 py-1.5 text-xs outline-none"
+              className="bg-slate-50 border border-slate-200 text-slate-800 rounded-md px-2.5 py-1.5 text-xs outline-none font-sans"
             >
               <option value="All">All Tracks</option>
               <option value="Healthcare">Healthcare</option>
@@ -108,12 +108,12 @@ export const ParticipantsPage: React.FC = () => {
             </select>
           </div>
 
-          <div className="flex items-center gap-1.5 text-xs text-slate-400">
+          <div className="flex items-center gap-1.5 text-xs text-slate-500 font-medium">
             Role:
             <select
               value={roleFilter}
               onChange={e => { setRoleFilter(e.target.value); setCurrentPage(1); }}
-              className="bg-slate-950 border border-slate-800 text-slate-200 rounded-lg px-2.5 py-1.5 text-xs outline-none"
+              className="bg-slate-50 border border-slate-200 text-slate-800 rounded-md px-2.5 py-1.5 text-xs outline-none font-sans"
             >
               <option value="All">All Roles</option>
               <option value="Leader">Team Leader</option>
@@ -125,7 +125,7 @@ export const ParticipantsPage: React.FC = () => {
 
       {/* GRID OF PARTICIPANT CARDS */}
       {paginatedParticipants.length === 0 ? (
-        <div className="p-12 text-center text-slate-500 text-xs font-mono border border-slate-800 rounded-2xl bg-slate-950/60">
+        <div className="p-12 text-center text-slate-400 text-xs font-sans border border-slate-200 rounded-xl bg-white">
           No participant records found in Firestore.
         </div>
       ) : (
@@ -134,56 +134,56 @@ export const ParticipantsPage: React.FC = () => {
             <GlassCard
               key={p.id}
               variant="default"
-              className="p-4 flex flex-col justify-between hover:border-emerald-500/40 transition-all hover:scale-[1.01] group"
+              className="p-4 flex flex-col justify-between hover:border-slate-300 transition-all bg-white border-slate-200 group shadow-2xs"
             >
               <div>
-                {/* Top Card Header with Photo Icon & Role */}
-                <div className="flex items-start gap-3 border-b border-slate-800 pb-3 mb-3">
-                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500/20 to-emerald-500/20 border border-cyan-500/30 flex items-center justify-center text-cyan-400 shrink-0">
+                {/* Top Card Header */}
+                <div className="flex items-start gap-3 border-b border-slate-100 pb-3 mb-3">
+                  <div className="w-10 h-10 rounded-lg bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-700 shrink-0">
                     <User className="w-5 h-5" />
                   </div>
 
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between gap-1">
-                      <h3 className="text-sm font-bold text-white truncate group-hover:text-cyan-300">{p.name}</h3>
+                      <h3 className="text-sm font-bold text-slate-900 truncate">{p.name}</h3>
                       <span
-                        className={`px-1.5 py-0.5 rounded text-[9px] font-bold shrink-0 ${
+                        className={`px-2 py-0.5 rounded-full text-[10px] font-semibold shrink-0 ${
                           p.role === 'Leader'
-                            ? 'bg-cyan-950 text-cyan-300 border border-cyan-500/40'
-                            : 'bg-slate-800 text-slate-300'
+                            ? 'bg-slate-900 text-white'
+                            : 'bg-slate-100 text-slate-700 border border-slate-200'
                         }`}
                       >
                         {p.role}
                       </span>
                     </div>
-                    <p className="text-[11px] text-cyan-400 font-mono truncate mt-0.5">{p.teamName}</p>
+                    <p className="text-[11px] text-slate-600 font-medium truncate mt-0.5">{p.teamName}</p>
                   </div>
                 </div>
 
                 {/* Participant Details */}
-                <div className="space-y-1.5 text-xs text-slate-300">
-                  <div className="flex items-center gap-2 text-slate-400">
-                    <GraduationCap className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                <div className="space-y-1.5 text-xs text-slate-600">
+                  <div className="flex items-center gap-2">
+                    <GraduationCap className="w-3.5 h-3.5 text-slate-400 shrink-0" />
                     <span className="truncate">{p.college} ({p.year})</span>
                   </div>
-                  <div className="flex items-center gap-2 text-slate-400">
-                    <Mail className="w-3.5 h-3.5 text-slate-500 shrink-0" />
+                  <div className="flex items-center gap-2">
+                    <Mail className="w-3.5 h-3.5 text-slate-400 shrink-0" />
                     <span className="truncate">{p.email}</span>
                   </div>
-                  <div className="flex items-center gap-2 text-slate-400">
-                    <Phone className="w-3.5 h-3.5 text-slate-500 shrink-0" />
+                  <div className="flex items-center gap-2">
+                    <Phone className="w-3.5 h-3.5 text-slate-400 shrink-0" />
                     <span>{p.phone}</span>
                   </div>
-                  <div className="flex items-center gap-2 text-[10px] text-slate-500 pt-1">
-                    <Calendar className="w-3 h-3 text-slate-600 shrink-0" />
+                  <div className="flex items-center gap-2 text-[11px] text-slate-400 pt-1">
+                    <Calendar className="w-3 h-3 text-slate-400 shrink-0" />
                     <span>Registered: {formatISTDateTime(p.registeredAt)}</span>
                   </div>
                 </div>
               </div>
 
               {/* Card Footer Actions & GitHub */}
-              <div className="mt-4 pt-3 border-t border-slate-800 flex items-center justify-between text-[11px]">
-                <span className="px-2 py-0.5 rounded bg-slate-900 text-emerald-400 border border-emerald-500/30 font-bold">
+              <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px]">
+                <span className="px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 border border-slate-200 font-medium">
                   {p.track}
                 </span>
 
@@ -193,24 +193,24 @@ export const ParticipantsPage: React.FC = () => {
                       href={p.githubUrl}
                       target="_blank"
                       rel="noreferrer"
-                      className="flex items-center gap-1 text-cyan-400 hover:underline font-bold"
+                      className="flex items-center gap-1 text-slate-800 hover:underline font-semibold"
                     >
                       <GitBranch className="w-3.5 h-3.5" /> GitHub
                     </a>
                   ) : (
-                    <span className="text-slate-600 italic">No GitHub</span>
+                    <span className="text-slate-400 italic">No GitHub</span>
                   )}
                   <button
                     onClick={() => handleEditParticipantTeam(p.teamId)}
                     title="Edit Team Details"
-                    className="p-1 rounded bg-slate-900 text-cyan-400 hover:bg-slate-800"
+                    className="p-1 rounded bg-slate-100 text-slate-700 hover:bg-slate-200 cursor-pointer"
                   >
                     <Edit3 className="w-3 h-3" />
                   </button>
                   <button
                     onClick={() => handleDeleteParticipantTeam(p.teamId, p.teamName)}
                     title="Delete Team Response"
-                    className="p-1 rounded bg-slate-900 text-pink-400 hover:bg-slate-800"
+                    className="p-1 rounded bg-rose-50 text-rose-600 hover:bg-rose-100 cursor-pointer"
                   >
                     <Trash2 className="w-3 h-3" />
                   </button>
@@ -223,22 +223,22 @@ export const ParticipantsPage: React.FC = () => {
 
       {/* Pagination Footer */}
       {totalPages > 1 && (
-        <div className="flex items-center justify-between pt-4 mt-2 border-t border-slate-800 text-xs">
-          <span className="text-slate-400">
+        <div className="flex items-center justify-between pt-4 mt-2 border-t border-slate-100 text-xs">
+          <span className="text-slate-500">
             Showing page {currentPage} of {totalPages}
           </span>
           <div className="flex items-center gap-2">
             <button
               disabled={currentPage === 1}
               onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-              className="p-1.5 rounded-lg bg-slate-900 border border-slate-800 text-slate-300 disabled:opacity-40"
+              className="p-1.5 rounded-md bg-slate-100 border border-slate-200 text-slate-700 disabled:opacity-40 cursor-pointer"
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
             <button
               disabled={currentPage === totalPages}
               onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-              className="p-1.5 rounded-lg bg-slate-900 border border-slate-800 text-slate-300 disabled:opacity-40"
+              className="p-1.5 rounded-md bg-slate-100 border border-slate-200 text-slate-700 disabled:opacity-40 cursor-pointer"
             >
               <ChevronRight className="w-4 h-4" />
             </button>

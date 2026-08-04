@@ -103,56 +103,56 @@ export const EditTeamModal: React.FC<EditTeamModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm font-mono overflow-y-auto">
-      <div className="w-full max-w-3xl bg-slate-900 border border-cyan-500/30 rounded-2xl p-6 shadow-2xl relative my-8 max-h-[90vh] flex flex-col">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs font-sans overflow-y-auto">
+      <div className="w-full max-w-3xl bg-white border border-slate-200 rounded-xl p-6 shadow-xl relative my-8 max-h-[90vh] flex flex-col">
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800"
+          className="absolute top-4 right-4 text-slate-400 hover:text-slate-700 p-1 rounded-lg hover:bg-slate-100 cursor-pointer"
         >
           <X className="w-5 h-5" />
         </button>
 
-        <div className="flex items-center gap-3 border-b border-cyan-500/20 pb-4 mb-5 shrink-0">
-          <div className="p-2.5 rounded-xl bg-cyan-500/10 border border-cyan-500/30 text-cyan-400">
-            <Edit3 className="w-6 h-6" />
+        <div className="flex items-center gap-3 border-b border-slate-100 pb-4 mb-5 shrink-0">
+          <div className="p-2.5 rounded-lg bg-slate-100 text-slate-800">
+            <Edit3 className="w-5 h-5" />
           </div>
           <div>
-            <h2 className="text-base font-bold text-white tracking-wide uppercase">EDIT RESPONSE / TEAM DETAILS</h2>
-            <p className="text-xs text-slate-400">Team ID: {formData.id} • Updates persist directly to Firestore</p>
+            <h2 className="text-base font-bold text-slate-900 tracking-tight">Edit Team Details</h2>
+            <p className="text-xs text-slate-500">Team ID: {formData.id}</p>
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6 overflow-y-auto pr-2 flex-1">
+        <form onSubmit={handleSubmit} className="space-y-6 overflow-y-auto pr-2 flex-1 font-sans">
           {/* General Info */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-bold text-slate-300 mb-1 uppercase">Team Name</label>
+              <label className="block text-xs font-semibold text-slate-700 mb-1 uppercase tracking-wide">Team Name</label>
               <input
                 type="text"
                 value={formData.name}
                 onChange={e => setFormData({ ...formData, name: e.target.value })}
                 required
-                className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-slate-200 focus:border-cyan-500 outline-none"
+                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-900 focus:border-slate-400 focus:bg-white outline-none"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-300 mb-1 uppercase">College / Institution</label>
+              <label className="block text-xs font-semibold text-slate-700 mb-1 uppercase tracking-wide">College / Institution</label>
               <input
                 type="text"
                 value={formData.college}
                 onChange={e => setFormData({ ...formData, college: e.target.value })}
                 required
-                className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-slate-200 focus:border-cyan-500 outline-none"
+                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-900 focus:border-slate-400 focus:bg-white outline-none"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-300 mb-1 uppercase">Track Category</label>
+              <label className="block text-xs font-semibold text-slate-700 mb-1 uppercase tracking-wide">Track Category</label>
               <select
                 value={formData.track}
                 onChange={e => setFormData({ ...formData, track: e.target.value as TrackType })}
-                className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-slate-200 focus:border-cyan-500 outline-none"
+                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-900 focus:border-slate-400 focus:bg-white outline-none"
               >
                 {TRACKS.map(t => (
                   <option key={t} value={t}>{t}</option>
@@ -161,11 +161,11 @@ export const EditTeamModal: React.FC<EditTeamModalProps> = ({
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-300 mb-1 uppercase">Verification Status</label>
+              <label className="block text-xs font-semibold text-slate-700 mb-1 uppercase tracking-wide">Verification Status</label>
               <select
                 value={formData.status}
                 onChange={e => setFormData({ ...formData, status: e.target.value as Team['status'] })}
-                className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-slate-200 focus:border-cyan-500 outline-none"
+                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-900 focus:border-slate-400 focus:bg-white outline-none"
               >
                 <option value="Verified">Verified</option>
                 <option value="Pending Review">Pending Review</option>
@@ -176,26 +176,26 @@ export const EditTeamModal: React.FC<EditTeamModalProps> = ({
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-slate-300 mb-1 uppercase">Project Description</label>
+            <label className="block text-xs font-semibold text-slate-700 mb-1 uppercase tracking-wide">Project Description</label>
             <textarea
               rows={3}
               value={formData.projectDescription || ''}
               onChange={e => setFormData({ ...formData, projectDescription: e.target.value })}
               placeholder="Brief summary of solution..."
-              className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-slate-200 focus:border-cyan-500 outline-none"
+              className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-900 focus:border-slate-400 focus:bg-white outline-none"
             />
           </div>
 
           {/* Members List Section */}
-          <div className="border-t border-slate-800 pt-4">
+          <div className="border-t border-slate-100 pt-4">
             <div className="flex items-center justify-between mb-3">
-              <h3 className="text-xs font-bold text-cyan-400 uppercase flex items-center gap-2">
-                <GraduationCap className="w-4 h-4 text-cyan-400" /> Team Roster ({formData.members.length} Members)
+              <h3 className="text-xs font-bold text-slate-900 uppercase flex items-center gap-2">
+                <GraduationCap className="w-4 h-4 text-slate-700" /> Team Roster ({formData.members.length} Members)
               </h3>
               <button
                 type="button"
                 onClick={addMember}
-                className="px-2.5 py-1 rounded-lg bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/20 text-xs flex items-center gap-1"
+                className="px-2.5 py-1 rounded-lg bg-slate-100 border border-slate-200 text-slate-700 hover:bg-slate-200 text-xs flex items-center gap-1 font-semibold cursor-pointer"
               >
                 <UserPlus className="w-3.5 h-3.5" /> Add Member
               </button>
@@ -203,10 +203,10 @@ export const EditTeamModal: React.FC<EditTeamModalProps> = ({
 
             <div className="space-y-3">
               {formData.members.map((member, idx) => (
-                <div key={member.id || idx} className="p-3 bg-slate-950 rounded-xl border border-slate-800 relative space-y-2">
+                <div key={member.id || idx} className="p-3 bg-slate-50 rounded-lg border border-slate-200 relative space-y-2">
                   <div className="flex items-center justify-between">
-                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded ${
-                      member.role === 'Leader' ? 'bg-cyan-950 text-cyan-400 border border-cyan-500/40' : 'bg-slate-800 text-slate-400'
+                    <span className={`text-[10px] font-semibold px-2 py-0.5 rounded ${
+                      member.role === 'Leader' ? 'bg-slate-900 text-white' : 'bg-slate-200 text-slate-700'
                     }`}>
                       {member.role}
                     </span>
@@ -214,7 +214,7 @@ export const EditTeamModal: React.FC<EditTeamModalProps> = ({
                       <button
                         type="button"
                         onClick={() => removeMember(idx)}
-                        className="text-pink-400 hover:text-pink-300 p-1"
+                        className="text-rose-600 hover:text-rose-700 p-1 cursor-pointer"
                         title="Remove Member"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
@@ -229,21 +229,21 @@ export const EditTeamModal: React.FC<EditTeamModalProps> = ({
                       value={member.name}
                       onChange={e => handleMemberChange(idx, 'name', e.target.value)}
                       required
-                      className="px-2.5 py-1.5 bg-slate-900 border border-slate-800 rounded-lg text-slate-200 outline-none"
+                      className="px-2.5 py-1.5 bg-white border border-slate-200 rounded-md text-slate-900 outline-none"
                     />
                     <input
                       type="email"
                       placeholder="Email"
                       value={member.email}
                       onChange={e => handleMemberChange(idx, 'email', e.target.value)}
-                      className="px-2.5 py-1.5 bg-slate-900 border border-slate-800 rounded-lg text-slate-200 outline-none"
+                      className="px-2.5 py-1.5 bg-white border border-slate-200 rounded-md text-slate-900 outline-none"
                     />
                     <input
                       type="text"
                       placeholder="Phone"
                       value={member.phone}
                       onChange={e => handleMemberChange(idx, 'phone', e.target.value)}
-                      className="px-2.5 py-1.5 bg-slate-900 border border-slate-800 rounded-lg text-slate-200 outline-none"
+                      className="px-2.5 py-1.5 bg-white border border-slate-200 rounded-md text-slate-900 outline-none"
                     />
                   </div>
 
@@ -253,21 +253,21 @@ export const EditTeamModal: React.FC<EditTeamModalProps> = ({
                       placeholder="College / Inst."
                       value={member.college}
                       onChange={e => handleMemberChange(idx, 'college', e.target.value)}
-                      className="px-2.5 py-1.5 bg-slate-900 border border-slate-800 rounded-lg text-slate-200 outline-none"
+                      className="px-2.5 py-1.5 bg-white border border-slate-200 rounded-md text-slate-900 outline-none"
                     />
                     <input
                       type="text"
                       placeholder="Year of Study"
                       value={member.year}
                       onChange={e => handleMemberChange(idx, 'year', e.target.value)}
-                      className="px-2.5 py-1.5 bg-slate-900 border border-slate-800 rounded-lg text-slate-200 outline-none"
+                      className="px-2.5 py-1.5 bg-white border border-slate-200 rounded-md text-slate-900 outline-none"
                     />
                     <input
                       type="text"
                       placeholder="GitHub URL (optional)"
                       value={member.githubUrl || ''}
                       onChange={e => handleMemberChange(idx, 'githubUrl', e.target.value)}
-                      className="px-2.5 py-1.5 bg-slate-900 border border-slate-800 rounded-lg text-slate-200 outline-none"
+                      className="px-2.5 py-1.5 bg-white border border-slate-200 rounded-md text-slate-900 outline-none"
                     />
                   </div>
                 </div>
@@ -275,21 +275,21 @@ export const EditTeamModal: React.FC<EditTeamModalProps> = ({
             </div>
           </div>
 
-          <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-800 shrink-0">
+          <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100 shrink-0">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 rounded-xl bg-slate-800 text-slate-300 text-xs font-bold hover:bg-slate-700"
+              className="px-4 py-2 rounded-lg bg-slate-100 text-slate-700 text-xs font-semibold hover:bg-slate-200 cursor-pointer"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isSaving}
-              className="px-5 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-500 text-slate-950 font-black text-xs hover:opacity-90 transition-opacity flex items-center gap-1.5"
+              className="px-5 py-2 rounded-lg bg-slate-900 text-white font-semibold text-xs hover:bg-slate-800 transition-all flex items-center gap-1.5 shadow-xs cursor-pointer"
             >
               <Save className="w-4 h-4" />
-              {isSaving ? 'Saving to Firestore...' : 'Save Firestore Changes'}
+              {isSaving ? 'Saving Changes...' : 'Save Changes'}
             </button>
           </div>
         </form>
