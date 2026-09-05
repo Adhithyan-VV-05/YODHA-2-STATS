@@ -55,6 +55,34 @@ export const TeamProfileDrawer: React.FC<TeamProfileDrawerProps> = ({ team, onCl
           </div>
         </div>
 
+        {/* Selected Problem Statement & Google Drive PPT Link */}
+        <div className="p-4 rounded-xl bg-slate-900 text-white mb-6 space-y-2.5">
+          {team.problemStatementTitle && (
+            <div>
+              <span className="text-[10px] font-mono text-sky-400 uppercase tracking-wider block">SELECTED PROBLEM STATEMENT</span>
+              <div className="text-sm font-bold text-white mt-0.5">
+                {team.problemStatementId ? `[ID #${team.problemStatementId}] ` : ""}{team.problemStatementTitle}
+              </div>
+            </div>
+          )}
+
+          {team.pptLink ? (
+            <div className="pt-2 border-t border-slate-800">
+              <span className="text-[10px] font-mono text-emerald-400 uppercase tracking-wider block mb-1">GOOGLE DRIVE PPT PRESENTATION LINK</span>
+              <a
+                href={team.pptLink}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-sky-950 border border-sky-500/40 text-sky-300 hover:text-white hover:border-sky-400 text-xs font-mono font-semibold transition-all break-all"
+              >
+                📁 Open Google Drive PPT Deck ↗
+              </a>
+            </div>
+          ) : (
+            <div className="text-xs text-slate-400 font-mono">No Google Drive PPT link attached</div>
+          )}
+        </div>
+
         {/* Project Brief */}
         {team.projectDescription && (
           <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 mb-6">

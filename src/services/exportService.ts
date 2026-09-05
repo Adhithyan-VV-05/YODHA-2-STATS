@@ -4,7 +4,7 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
 export function exportTeamsToCSV(teams: Team[], filename = 'yodha_teams_export.csv') {
-  const headers = ['Team ID', 'Team Name', 'Leader Name', 'Leader Email', 'Leader Phone', 'College', 'Track', 'Members Count', 'Status', 'Created At'];
+  const headers = ['Team ID', 'Team Name', 'Leader Name', 'Leader Email', 'Leader Phone', 'College', 'Track', 'Problem Statement', 'Google Drive PPT Link', 'Members Count', 'Status', 'Created At'];
   const rows = teams.map(t => [
     t.id,
     `"${t.name.replace(/"/g, '""')}"`,
@@ -13,6 +13,8 @@ export function exportTeamsToCSV(teams: Team[], filename = 'yodha_teams_export.c
     t.leaderPhone,
     `"${t.college.replace(/"/g, '""')}"`,
     t.track,
+    `"${(t.problemStatementTitle || '').replace(/"/g, '""')}"`,
+    `"${(t.pptLink || '').replace(/"/g, '""')}"`,
     t.size,
     t.status,
     t.createdAt
@@ -37,6 +39,8 @@ export function exportTeamsToExcel(teams: Team[], filename = 'yodha_teams_export
     'Leader Phone': t.leaderPhone,
     'College': t.college,
     'Track': t.track,
+    'Problem Statement': t.problemStatementTitle || 'N/A',
+    'Google Drive PPT Link': t.pptLink || 'N/A',
     'Size': t.size,
     'Status': t.status,
     'Registration Date': t.createdAt,

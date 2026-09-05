@@ -22,6 +22,11 @@ export interface Team {
   leaderPhone: string;
   college: string;
   track: TrackType;
+  problemStatementId?: number;
+  problemStatementTitle?: string;
+  pptLink?: string;
+  warriorReferralCode?: string;
+  usedReferralCode?: string;
   members: TeamMember[];
   size: number;
   createdAt: string;

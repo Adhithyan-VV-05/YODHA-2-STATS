@@ -38,8 +38,8 @@ export function subscribeToRegistrations(
   onError: (err: any) => void
 ) {
   try {
-    const q = query(collection(db, 'registrations'));
-    return onSnapshot(q, (snapshot) => {
+    const qTeams = query(collection(db, 'teams'));
+    return onSnapshot(qTeams, (snapshot) => {
       const teams: Team[] = [];
       snapshot.forEach(docSnap => {
         const d = docSnap.data();
@@ -96,6 +96,11 @@ export function subscribeToRegistrations(
           leaderPhone,
           college,
           track: mapTrackName(d.track),
+          problemStatementId: d.problemStatementId || undefined,
+          problemStatementTitle: d.problemStatementTitle || undefined,
+          pptLink: d.pptLink || undefined,
+          warriorReferralCode: d.warriorReferralCode || undefined,
+          usedReferralCode: d.usedReferralCode || undefined,
           members: allMembers,
           size: d.teamSize || allMembers.length,
           createdAt,
@@ -103,6 +108,10 @@ export function subscribeToRegistrations(
           projectDescription: d.projectDescription || undefined
         });
       });
+
+      // Sort latest registrations FIRST (Descending by createdAt timestamp)
+      teams.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
       onData(teams);
     }, onError);
   } catch (err) {
