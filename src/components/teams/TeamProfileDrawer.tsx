@@ -55,31 +55,48 @@ export const TeamProfileDrawer: React.FC<TeamProfileDrawerProps> = ({ team, onCl
           </div>
         </div>
 
-        {/* Selected Problem Statement & Google Drive PPT Link */}
-        <div className="p-4 rounded-xl bg-slate-900 text-white mb-6 space-y-2.5">
+        {/* Selected Problem Statement & Google Drive Link */}
+        <div className="p-4 rounded-xl bg-slate-900 text-white mb-6 space-y-3 shadow-sm">
           {team.problemStatementTitle && (
             <div>
-              <span className="text-[10px] font-mono text-sky-400 uppercase tracking-wider block">SELECTED PROBLEM STATEMENT</span>
+              <span className="text-[10px] font-mono text-sky-400 uppercase tracking-wider block font-semibold">SELECTED PROBLEM STATEMENT</span>
               <div className="text-sm font-bold text-white mt-0.5">
                 {team.problemStatementId ? `[ID #${team.problemStatementId}] ` : ""}{team.problemStatementTitle}
               </div>
             </div>
           )}
 
-          {team.pptLink ? (
-            <div className="pt-2 border-t border-slate-800">
-              <span className="text-[10px] font-mono text-emerald-400 uppercase tracking-wider block mb-1">GOOGLE DRIVE PPT PRESENTATION LINK</span>
-              <a
-                href={team.pptLink}
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-sky-950 border border-sky-500/40 text-sky-300 hover:text-white hover:border-sky-400 text-xs font-mono font-semibold transition-all break-all"
-              >
-                📁 Open Google Drive PPT Deck ↗
-              </a>
+          {(team.driveLink || team.pptLink) ? (
+            <div className="pt-2.5 border-t border-slate-800">
+              <span className="text-[10px] font-mono text-emerald-400 uppercase tracking-wider block mb-1.5 font-semibold">GOOGLE DRIVE / PPT PRESENTATION LINK</span>
+              <div className="flex flex-wrap items-center gap-2">
+                <a
+                  href={team.driveLink || team.pptLink}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg bg-emerald-950/80 border border-emerald-500/50 text-emerald-300 hover:text-white hover:bg-emerald-900 text-xs font-mono font-semibold transition-all break-all"
+                >
+                  📁 Open Google Drive Link ↗
+                </a>
+                <button
+                  onClick={() => {
+                    const link = team.driveLink || team.pptLink || '';
+                    navigator.clipboard.writeText(link);
+                    alert('Google Drive Link copied to clipboard!');
+                  }}
+                  className="px-2.5 py-1.5 rounded-lg bg-slate-800 border border-slate-700 text-slate-300 hover:text-white text-xs font-mono font-medium transition-all cursor-pointer"
+                >
+                  📋 Copy Link
+                </button>
+              </div>
+              <div className="text-[11px] font-mono text-slate-400 truncate mt-1.5">
+                {team.driveLink || team.pptLink}
+              </div>
             </div>
           ) : (
-            <div className="text-xs text-slate-400 font-mono">No Google Drive PPT link attached</div>
+            <div className="pt-2 border-t border-slate-800 text-xs text-slate-400 font-mono">
+              No Google Drive presentation link submitted during registration
+            </div>
           )}
         </div>
 

@@ -4,7 +4,7 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
 export function exportTeamsToCSV(teams: Team[], filename = 'yodha_teams_export.csv') {
-  const headers = ['Team ID', 'Team Name', 'Leader Name', 'Leader Email', 'Leader Phone', 'College', 'Track', 'Problem Statement', 'Google Drive PPT Link', 'Members Count', 'Status', 'Created At'];
+  const headers = ['Team ID', 'Team Name', 'Leader Name', 'Leader Email', 'Leader Phone', 'College', 'Track', 'Problem Statement', 'Google Drive Link', 'Members Count', 'Status', 'Created At'];
   const rows = teams.map(t => [
     t.id,
     `"${t.name.replace(/"/g, '""')}"`,
@@ -14,7 +14,7 @@ export function exportTeamsToCSV(teams: Team[], filename = 'yodha_teams_export.c
     `"${t.college.replace(/"/g, '""')}"`,
     t.track,
     `"${(t.problemStatementTitle || '').replace(/"/g, '""')}"`,
-    `"${(t.pptLink || '').replace(/"/g, '""')}"`,
+    `"${(t.driveLink || t.pptLink || '').replace(/"/g, '""')}"`,
     t.size,
     t.status,
     t.createdAt
@@ -40,7 +40,7 @@ export function exportTeamsToExcel(teams: Team[], filename = 'yodha_teams_export
     'College': t.college,
     'Track': t.track,
     'Problem Statement': t.problemStatementTitle || 'N/A',
-    'Google Drive PPT Link': t.pptLink || 'N/A',
+    'Google Drive Link': t.driveLink || t.pptLink || 'N/A',
     'Size': t.size,
     'Status': t.status,
     'Registration Date': t.createdAt,
@@ -91,6 +91,7 @@ export function exportTeamPDF(team: Team) {
   doc.text(`Status: ${team.status}`, 14, 70);
   doc.text(`Members: ${team.size}`, 14, 76);
   doc.text(`Leader Contact: ${team.leaderName} (${team.leaderEmail} | ${team.leaderPhone})`, 14, 82);
+  doc.text(`Google Drive Link: ${team.driveLink || team.pptLink || 'N/A'}`, 14, 88);
 
   // Members Table
   const tableData = team.members.map(m => [
@@ -104,7 +105,7 @@ export function exportTeamPDF(team: Team) {
   ]);
 
   autoTable(doc, {
-    startY: 90,
+    startY: 96,
     head: [['Role', 'Name', 'Email', 'Phone', 'Year', 'Gender', 'GitHub']],
     body: tableData,
     headStyles: { fillColor: [13, 17, 26], textColor: [0, 243, 255] },

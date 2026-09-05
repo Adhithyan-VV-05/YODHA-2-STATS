@@ -176,6 +176,17 @@ export const EditTeamModal: React.FC<EditTeamModalProps> = ({
           </div>
 
           <div>
+            <label className="block text-xs font-semibold text-slate-700 mb-1 uppercase tracking-wide">Google Drive / PPT Presentation Link</label>
+            <input
+              type="text"
+              value={formData.driveLink || formData.pptLink || ''}
+              onChange={e => setFormData({ ...formData, driveLink: e.target.value, pptLink: e.target.value })}
+              placeholder="https://drive.google.com/..."
+              className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-900 focus:border-slate-400 focus:bg-white outline-none font-mono"
+            />
+          </div>
+
+          <div>
             <label className="block text-xs font-semibold text-slate-700 mb-1 uppercase tracking-wide">Project Description</label>
             <textarea
               rows={3}

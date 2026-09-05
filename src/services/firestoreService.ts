@@ -13,6 +13,17 @@ function mapTrackName(rawTrack: string): TrackType {
   return 'Open Hardware';
 }
 
+function parseFirestoreDate(val: any): string {
+  if (!val) return new Date().toISOString();
+  if (typeof val === 'string') return val;
+  if (typeof val === 'number') return new Date(val).toISOString();
+  if (typeof val === 'object') {
+    if (val.seconds) return new Date(val.seconds * 1000).toISOString();
+    if (typeof val.toDate === 'function') return val.toDate().toISOString();
+  }
+  return new Date().toISOString();
+}
+
 function parseBrowserFromUA(ua?: string): BrowserType {
   if (!ua) return 'Chrome';
   if (ua.includes('Edg/')) return 'Edge';
@@ -38,23 +49,45 @@ export function subscribeToRegistrations(
   onError: (err: any) => void
 ) {
   try {
-    const qTeams = query(collection(db, 'teams'));
-    return onSnapshot(qTeams, (snapshot) => {
-      const teams: Team[] = [];
-      snapshot.forEach(docSnap => {
-        const d = docSnap.data();
+    const rawDocsMap = new Map<string, { id: string; data: any }>();
 
+    const processSnapshot = () => {
+      const teams: Team[] = [];
+
+      rawDocsMap.forEach(({ id: docId, data: d }) => {
         const leaderObj = d.leader || {};
-        const leaderName = leaderObj.fullName || d.leaderName || d.teamName || 'Leader';
-        const leaderEmail = leaderObj.email || d.leaderEmail || '';
-        const leaderPhone = leaderObj.phone || d.leaderPhone || '';
-        const college = leaderObj.organization || d.college || 'N/A';
-        const year = leaderObj.yearOfStudy || d.year || '3rd Year';
-        const gender = leaderObj.gender || 'Male';
-        const githubUrl = leaderObj.githubUrl || '';
+        const leaderName = leaderObj.fullName || leaderObj.name || d.leaderName || d.leader_name || d.teamName || 'Leader';
+        const leaderEmail = leaderObj.email || d.leaderEmail || d.leader_email || d.email || '';
+        const leaderPhone = leaderObj.phone || d.leaderPhone || d.leader_phone || d.phone || '';
+        const college = leaderObj.organization || leaderObj.college || d.college || d.institution || d.university || d.organization || 'N/A';
+        const year = leaderObj.yearOfStudy || leaderObj.year || d.yearOfStudy || d.year || '3rd Year';
+        const gender = leaderObj.gender || d.gender || 'Male';
+        const githubUrl = leaderObj.githubUrl || leaderObj.github || d.githubUrl || d.github_url || d.github || '';
+
+        // Extract Drive Link / PPT Link from all common Firestore field names
+        const rawDriveLink =
+          d.driveLink ||
+          d.drive_link ||
+          d.googleDriveLink ||
+          d.google_drive_link ||
+          d.pptLink ||
+          d.ppt_link ||
+          d.presentationLink ||
+          d.submissionLink ||
+          d.drive ||
+          d.link ||
+          d.pdfLink ||
+          d.projectLink ||
+          d.repoUrl ||
+          leaderObj.driveLink ||
+          leaderObj.pptLink ||
+          '';
+
+        const driveLink = rawDriveLink ? String(rawDriveLink).trim() : undefined;
+        const pptLink = driveLink;
 
         const leaderMember: TeamMember = {
-          id: `mbr-${docSnap.id}-leader`,
+          id: `mbr-${docId}-leader`,
           name: leaderName,
           email: leaderEmail,
           phone: leaderPhone,
@@ -62,58 +95,88 @@ export function subscribeToRegistrations(
           year,
           gender,
           githubUrl: githubUrl || undefined,
+          driveLink,
           role: 'Leader'
         };
 
-        const otherMembers: TeamMember[] = Array.isArray(d.members)
-          ? d.members.map((m: any, idx: number) => ({
-              id: `mbr-${docSnap.id}-${idx}`,
-              name: m.fullName || m.name || `Member ${idx + 1}`,
-              email: m.email || '',
-              phone: m.phone || '',
-              college: m.organization || college,
-              year: m.yearOfStudy || year || '3rd Year',
-              gender: m.gender || 'Male',
-              githubUrl: m.githubUrl || undefined,
-              role: 'Member'
-            }))
+        const rawMembersList = Array.isArray(d.members)
+          ? d.members
+          : Array.isArray(d.teamMembers)
+          ? d.teamMembers
+          : Array.isArray(d.participants)
+          ? d.participants
           : [];
+
+        const otherMembers: TeamMember[] = rawMembersList.map((m: any, idx: number) => ({
+          id: `mbr-${docId}-${idx}`,
+          name: m.fullName || m.name || `Member ${idx + 1}`,
+          email: m.email || '',
+          phone: m.phone || '',
+          college: m.organization || m.college || college,
+          year: m.yearOfStudy || m.year || year || '3rd Year',
+          gender: m.gender || 'Male',
+          githubUrl: m.githubUrl || m.github || undefined,
+          driveLink: m.driveLink || m.pptLink || undefined,
+          role: 'Member'
+        }));
 
         const allMembers = [leaderMember, ...otherMembers];
 
-        let createdAt = new Date().toISOString();
-        if (d.submittedAt) {
-          createdAt = d.submittedAt;
-        } else if (d.createdAt && d.createdAt.seconds) {
-          createdAt = new Date(d.createdAt.seconds * 1000).toISOString();
-        }
+        // Parse registration timestamp robustly
+        const createdAt = parseFirestoreDate(
+          d.submittedAt || d.createdAt || d.timestamp || d.registeredAt || d.date || d.created_at
+        );
 
         teams.push({
-          id: docSnap.id,
-          name: d.teamName || `Team-${docSnap.id.substring(0, 5)}`,
+          id: docId,
+          name: d.teamName || d.name || `Team-${docId.substring(0, 5)}`,
           leaderName,
           leaderEmail,
           leaderPhone,
           college,
-          track: mapTrackName(d.track),
-          problemStatementId: d.problemStatementId || undefined,
-          problemStatementTitle: d.problemStatementTitle || undefined,
-          pptLink: d.pptLink || undefined,
-          warriorReferralCode: d.warriorReferralCode || undefined,
+          track: mapTrackName(d.track || d.trackType || d.category),
+          problemStatementId: d.problemStatementId || d.problemId || undefined,
+          problemStatementTitle: d.problemStatementTitle || d.problemStatement || d.problemTitle || undefined,
+          pptLink,
+          driveLink,
+          warriorReferralCode: d.warriorReferralCode || d.referralCode || undefined,
           usedReferralCode: d.usedReferralCode || undefined,
           members: allMembers,
           size: d.teamSize || allMembers.length,
           createdAt,
           status: d.status || 'Verified',
-          projectDescription: d.projectDescription || undefined
+          projectDescription: d.projectDescription || d.description || d.abstract || undefined
         });
       });
 
-      // Sort latest registrations FIRST (Descending by createdAt timestamp)
+      // STRICTLY SORT LATEST REGISTRATIONS FIRST (Descending by createdAt timestamp)
       teams.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
       onData(teams);
+    };
+
+    // Subscribe to both 'teams' and 'registrations' collections to guarantee all records are captured
+    const qTeams = query(collection(db, 'teams'));
+    const qRegs = query(collection(db, 'registrations'));
+
+    const unsubTeams = onSnapshot(qTeams, (snapshot) => {
+      snapshot.forEach(docSnap => {
+        rawDocsMap.set(docSnap.id, { id: docSnap.id, data: docSnap.data() });
+      });
+      processSnapshot();
     }, onError);
+
+    const unsubRegs = onSnapshot(qRegs, (snapshot) => {
+      snapshot.forEach(docSnap => {
+        rawDocsMap.set(docSnap.id, { id: docSnap.id, data: docSnap.data() });
+      });
+      processSnapshot();
+    }, () => {});
+
+    return () => {
+      unsubTeams();
+      unsubRegs();
+    };
   } catch (err) {
     onError(err);
     return () => {};
@@ -126,7 +189,7 @@ export function subscribeToUserSessions(
   onError: (err: any) => void
 ) {
   try {
-    const q = query(collection(db, 'user_sessions'), limit(150));
+    const q = query(collection(db, 'user_sessions'), limit(200));
     return onSnapshot(q, (snapshot) => {
       const sessions: VisitorSession[] = [];
       const now = Date.now();
@@ -140,18 +203,26 @@ export function subscribeToUserSessions(
           lastActiveMs = d.createdAt.seconds * 1000;
         }
 
-        const durationSeconds = d.durationSeconds || 180;
-        const activeTimeSeconds = d.activeTimeSeconds || Math.round(durationSeconds * 0.85);
-        const inactiveTimeSeconds = d.inactiveTimeSeconds || (durationSeconds - activeTimeSeconds);
+        const durationSeconds = typeof d.totalDurationSeconds === 'number'
+          ? d.totalDurationSeconds
+          : (typeof d.durationSeconds === 'number' ? d.durationSeconds : 0);
 
-        const isOnline = (now - lastActiveMs) < 5 * 60 * 1000;
-        const rawTabStatus = d.tabStatus || (isOnline ? 'Focused' : 'Offline');
+        const activeTimeSeconds = typeof d.activeDurationSeconds === 'number'
+          ? d.activeDurationSeconds
+          : (typeof d.activeTimeSeconds === 'number' ? d.activeTimeSeconds : Math.round(durationSeconds * 0.85));
 
-        const tabStatus: TabStatus = (
-          ['Online', 'Focused', 'Background', 'Offline'].includes(rawTabStatus)
-            ? rawTabStatus
-            : isOnline ? 'Focused' : 'Offline'
-        ) as TabStatus;
+        const inactiveTimeSeconds = typeof d.inactiveDurationSeconds === 'number'
+          ? d.inactiveDurationSeconds
+          : (typeof d.inactiveTimeSeconds === 'number' ? d.inactiveTimeSeconds : Math.max(0, durationSeconds - activeTimeSeconds));
+
+        const isOnline = d.isOnline !== undefined ? Boolean(d.isOnline) : ((now - lastActiveMs) < 3 * 60 * 1000);
+        
+        let tabStatus: TabStatus = 'Offline';
+        if (isOnline) {
+          tabStatus = d.isTabActive ? 'Focused' : 'Background';
+        } else {
+          tabStatus = 'Offline';
+        }
 
         const device = (d.deviceType as DeviceType) || 'Desktop';
         const browser = parseBrowserFromUA(d.userAgent);
@@ -168,7 +239,7 @@ export function subscribeToUserSessions(
           device,
           browser,
           os,
-          screenResolution: d.screenResolution || '1920x1080',
+          screenResolution: d.screenResolution || d.viewportResolution || '1920x1080',
           durationSeconds,
           activeTimeSeconds,
           inactiveTimeSeconds,
@@ -244,7 +315,14 @@ export async function updateFirestoreAdminPasscode(db: Firestore, newPasscode: s
 }
 
 export async function addFirestoreTeam(db: Firestore, team: Team) {
-  await setDoc(doc(db, 'registrations', team.id), team);
+  const payload = {
+    ...team,
+    driveLink: team.driveLink || team.pptLink || '',
+    pptLink: team.pptLink || team.driveLink || '',
+    googleDriveLink: team.driveLink || team.pptLink || ''
+  };
+  await setDoc(doc(db, 'registrations', team.id), payload).catch(() => {});
+  await setDoc(doc(db, 'teams', team.id), payload).catch(() => {});
 }
 
 export async function updateFirestoreTeam(db: Firestore, team: Team) {
@@ -260,6 +338,9 @@ export async function updateFirestoreTeam(db: Firestore, team: Team) {
     leaderPhone: team.leaderPhone,
     teamSize: team.members.length,
     status: team.status,
+    pptLink: team.pptLink || team.driveLink || '',
+    driveLink: team.driveLink || team.pptLink || '',
+    googleDriveLink: team.driveLink || team.pptLink || '',
     projectDescription: team.projectDescription || '',
     leader: {
       fullName: leaderMember?.name || team.leaderName,
@@ -268,7 +349,8 @@ export async function updateFirestoreTeam(db: Firestore, team: Team) {
       organization: team.college,
       yearOfStudy: leaderMember?.year || '3rd Year',
       gender: leaderMember?.gender || 'Male',
-      githubUrl: leaderMember?.githubUrl || ''
+      githubUrl: leaderMember?.githubUrl || '',
+      driveLink: leaderMember?.driveLink || team.driveLink || ''
     },
     members: regularMembers.map(m => ({
       fullName: m.name,
@@ -277,19 +359,39 @@ export async function updateFirestoreTeam(db: Firestore, team: Team) {
       organization: m.college || team.college,
       yearOfStudy: m.year,
       gender: m.gender,
-      githubUrl: m.githubUrl || ''
+      githubUrl: m.githubUrl || '',
+      driveLink: m.driveLink || ''
     }))
   };
 
-  await updateDoc(doc(db, 'registrations', team.id), updatePayload);
+  try {
+    await updateDoc(doc(db, 'registrations', team.id), updatePayload);
+  } catch {
+    await setDoc(doc(db, 'registrations', team.id), updatePayload, { merge: true }).catch(() => {});
+  }
+  try {
+    await updateDoc(doc(db, 'teams', team.id), updatePayload);
+  } catch {
+    await setDoc(doc(db, 'teams', team.id), updatePayload, { merge: true }).catch(() => {});
+  }
 }
 
 export async function updateFirestoreTeamStatus(db: Firestore, teamId: string, status: Team['status']) {
-  await updateDoc(doc(db, 'registrations', teamId), { status });
+  try {
+    await updateDoc(doc(db, 'registrations', teamId), { status });
+  } catch {
+    await setDoc(doc(db, 'registrations', teamId), { status }, { merge: true }).catch(() => {});
+  }
+  try {
+    await updateDoc(doc(db, 'teams', teamId), { status });
+  } catch {
+    await setDoc(doc(db, 'teams', teamId), { status }, { merge: true }).catch(() => {});
+  }
 }
 
 export async function deleteFirestoreTeam(db: Firestore, teamId: string) {
-  await deleteDoc(doc(db, 'registrations', teamId));
+  await deleteDoc(doc(db, 'registrations', teamId)).catch(() => {});
+  await deleteDoc(doc(db, 'teams', teamId)).catch(() => {});
 }
 
 export interface ReferralRoom {

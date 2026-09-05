@@ -56,7 +56,9 @@ export const DashboardPage: React.FC = () => {
     t.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     t.leaderName.toLowerCase().includes(searchQuery.toLowerCase()) ||
     t.college.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    t.track.toLowerCase().includes(searchQuery.toLowerCase())
+    t.track.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    (t.driveLink || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+    (t.pptLink || '').toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const totalPages = Math.ceil(filteredTeams.length / itemsPerPage) || 1;
@@ -304,58 +306,76 @@ export const DashboardPage: React.FC = () => {
                   <th className="p-3">Leader</th>
                   <th className="p-3">College</th>
                   <th className="p-3">Track</th>
+                  <th className="p-3">Drive Link</th>
                   <th className="p-3">Members</th>
                   <th className="p-3">Registered (IST)</th>
                   <th className="p-3 text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 text-slate-700">
-                {paginatedTeams.map((team) => (
-                  <tr key={team.id} className="hover:bg-slate-50/80 transition-colors">
-                    <td className="p-3 font-semibold text-slate-900">{team.name}</td>
-                    <td className="p-3 font-medium text-slate-800">{team.leaderName}</td>
-                    <td className="p-3 text-slate-600">{team.college}</td>
-                    <td className="p-3">
-                      <span className="px-2 py-0.5 rounded text-[11px] font-medium bg-slate-100 text-slate-700 border border-slate-200">
-                        {team.track}
-                      </span>
-                    </td>
-                    <td className="p-3 font-semibold text-slate-800">{team.members.length}</td>
-                    <td className="p-3 text-slate-500 text-[11px]">{formatISTDateTime(team.createdAt)}</td>
-                    <td className="p-3 text-right">
-                      <div className="flex items-center justify-end gap-1.5">
-                        <button
-                          onClick={() => setSelectedTeam(team)}
-                          title="View Full Profile Drawer"
-                          className="px-2.5 py-1 rounded-md bg-slate-100 border border-slate-200 text-slate-700 hover:bg-slate-200 text-[11px] font-semibold flex items-center gap-1 cursor-pointer"
-                        >
-                          <Eye className="w-3.5 h-3.5" /> View
-                        </button>
-                        <button
-                          onClick={() => handleEditClick(team)}
-                          title="Edit Team Response"
-                          className="p-1.5 rounded-md bg-slate-100 border border-slate-200 text-slate-700 hover:bg-slate-200 cursor-pointer"
-                        >
-                          <Edit3 className="w-3.5 h-3.5" />
-                        </button>
-                        <button
-                          onClick={() => exportTeamPDF(team)}
-                          title="Export Team PDF"
-                          className="p-1.5 rounded-md bg-slate-100 border border-slate-200 text-slate-700 hover:bg-slate-200 cursor-pointer"
-                        >
-                          <Download className="w-3.5 h-3.5" />
-                        </button>
-                        <button
-                          onClick={() => handleDeleteClick(team)}
-                          title="Delete Response from Firestore"
-                          className="p-1.5 rounded-md bg-rose-50 border border-rose-200 text-rose-600 hover:bg-rose-100 cursor-pointer"
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+                {paginatedTeams.map((team) => {
+                  const driveLink = team.driveLink || team.pptLink;
+                  return (
+                    <tr key={team.id} className="hover:bg-slate-50/80 transition-colors">
+                      <td className="p-3 font-semibold text-slate-900">{team.name}</td>
+                      <td className="p-3 font-medium text-slate-800">{team.leaderName}</td>
+                      <td className="p-3 text-slate-600">{team.college}</td>
+                      <td className="p-3">
+                        <span className="px-2 py-0.5 rounded text-[11px] font-medium bg-slate-100 text-slate-700 border border-slate-200">
+                          {team.track}
+                        </span>
+                      </td>
+                      <td className="p-3">
+                        {driveLink ? (
+                          <a
+                            href={driveLink}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 text-[11px] font-mono font-semibold transition-all"
+                          >
+                            📁 Drive Link ↗
+                          </a>
+                        ) : (
+                          <span className="text-[11px] text-slate-400 font-mono italic">No Link</span>
+                        )}
+                      </td>
+                      <td className="p-3 font-semibold text-slate-800">{team.members.length}</td>
+                      <td className="p-3 text-slate-500 text-[11px]">{formatISTDateTime(team.createdAt)}</td>
+                      <td className="p-3 text-right">
+                        <div className="flex items-center justify-end gap-1.5">
+                          <button
+                            onClick={() => setSelectedTeam(team)}
+                            title="View Full Profile Drawer"
+                            className="px-2.5 py-1 rounded-md bg-slate-100 border border-slate-200 text-slate-700 hover:bg-slate-200 text-[11px] font-semibold flex items-center gap-1 cursor-pointer"
+                          >
+                            <Eye className="w-3.5 h-3.5" /> View
+                          </button>
+                          <button
+                            onClick={() => handleEditClick(team)}
+                            title="Edit Team Response"
+                            className="p-1.5 rounded-md bg-slate-100 border border-slate-200 text-slate-700 hover:bg-slate-200 cursor-pointer"
+                          >
+                            <Edit3 className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            onClick={() => exportTeamPDF(team)}
+                            title="Export Team PDF"
+                            className="p-1.5 rounded-md bg-slate-100 border border-slate-200 text-slate-700 hover:bg-slate-200 cursor-pointer"
+                          >
+                            <Download className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            onClick={() => handleDeleteClick(team)}
+                            title="Delete Response from Firestore"
+                            className="p-1.5 rounded-md bg-rose-50 border border-rose-200 text-rose-600 hover:bg-rose-100 cursor-pointer"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>

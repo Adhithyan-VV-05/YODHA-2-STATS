@@ -11,6 +11,7 @@ export interface TeamMember {
   year: string;
   gender: 'Male' | 'Female' | 'Other';
   githubUrl?: string;
+  driveLink?: string;
   role: 'Leader' | 'Member';
 }
 
@@ -25,6 +26,7 @@ export interface Team {
   problemStatementId?: number;
   problemStatementTitle?: string;
   pptLink?: string;
+  driveLink?: string;
   warriorReferralCode?: string;
   usedReferralCode?: string;
   members: TeamMember[];
@@ -34,3 +36,4 @@ export interface Team {
   githubRepo?: string;
   projectDescription?: string;
 }
+
