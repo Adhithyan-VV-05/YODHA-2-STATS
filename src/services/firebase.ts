@@ -12,15 +12,6 @@ export interface FirebaseConfig {
 }
 
 export function getStoredFirebaseConfig(): FirebaseConfig | null {
-  const stored = localStorage.getItem('yodha_firebase_config');
-  if (stored) {
-    try {
-      return JSON.parse(stored);
-    } catch {
-      return null;
-    }
-  }
-
   const envConfig: FirebaseConfig = {
     apiKey: import.meta.env.VITE_FIREBASE_API_KEY || '',
     authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || '',
@@ -32,6 +23,15 @@ export function getStoredFirebaseConfig(): FirebaseConfig | null {
 
   if (envConfig.apiKey && envConfig.projectId) {
     return envConfig;
+  }
+
+  const stored = localStorage.getItem('yodha_firebase_config');
+  if (stored) {
+    try {
+      return JSON.parse(stored);
+    } catch {
+      return null;
+    }
   }
 
   return null;
