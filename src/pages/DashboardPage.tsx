@@ -79,17 +79,17 @@ export const DashboardPage: React.FC = () => {
   };
 
   const metricCards = [
-    { title: 'Total Website Visits', value: metrics.totalVisits, icon: Eye, growth: '+18.4%' },
+    { title: 'Total Website Visits', value: metrics.totalVisits, icon: Eye, growth: 'Visits' },
     { title: 'Live Visitors', value: metrics.activeUsersOnline, icon: Activity, growth: 'Realtime' },
-    { title: 'Total Teams', value: metrics.totalTeams, icon: Users, growth: '+12.5%' },
-    { title: 'Total Participants', value: metrics.totalParticipants, icon: UserCheck, growth: '+24.1%' },
+    { title: 'Total Teams', value: metrics.totalTeams, icon: Users, growth: 'Teams' },
+    { title: 'Total Participants', value: metrics.totalParticipants, icon: UserCheck, growth: 'Participants' },
     { title: "Today's Registrations", value: metrics.todayRegistrations, icon: Zap, growth: 'Today' },
     { title: 'Referral Codes', value: metrics.totalReferralCodes || 0, icon: Gift, growth: 'Active Rooms' },
     { title: 'Successful Referrals', value: metrics.totalSuccessfulReferrals || 0, icon: Gift, growth: 'Referred Teams' },
-    { title: 'Healthcare Teams', value: metrics.healthcareTeams, icon: HeartPulse, growth: 'Track Lead' },
-    { title: 'Environment Teams', value: metrics.environmentTeams, icon: Leaf, growth: 'Active' },
+    { title: 'Healthcare Teams', value: metrics.healthcareTeams, icon: HeartPulse, growth: 'Healthcare Track' },
+    { title: 'Environment Teams', value: metrics.environmentTeams, icon: Leaf, growth: 'Environment Track' },
     { title: 'Average Team Size', value: metrics.avgTeamSize, decimals: 1, suffix: ' members', icon: Users, growth: 'Avg Size' },
-    { title: 'Average Active Time', value: Math.round(metrics.avgActiveTimeSeconds / 60) || 5, suffix: ' mins', icon: Clock, growth: 'Stay Time' }
+    { title: 'Average Active Time', value: Math.round(metrics.avgActiveTimeSeconds / 60), suffix: ' mins', icon: Clock, growth: 'Active Time' }
   ];
 
   return (
