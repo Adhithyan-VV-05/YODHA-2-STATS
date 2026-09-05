@@ -196,11 +196,15 @@ export function subscribeToUserSessions(
 
       snapshot.forEach(docSnap => {
         const d = docSnap.data();
-        let lastActiveMs = now;
+        let lastActiveMs = 0;
         if (d.lastActive && d.lastActive.seconds) {
           lastActiveMs = d.lastActive.seconds * 1000;
+        } else if (d.lastActive && typeof d.lastActive === 'string') {
+          lastActiveMs = new Date(d.lastActive).getTime();
         } else if (d.createdAt && d.createdAt.seconds) {
           lastActiveMs = d.createdAt.seconds * 1000;
+        } else if (d.createdAt && typeof d.createdAt === 'string') {
+          lastActiveMs = new Date(d.createdAt).getTime();
         }
 
         const durationSeconds = typeof d.totalDurationSeconds === 'number'
@@ -215,7 +219,11 @@ export function subscribeToUserSessions(
           ? d.inactiveDurationSeconds
           : (typeof d.inactiveTimeSeconds === 'number' ? d.inactiveTimeSeconds : Math.max(0, durationSeconds - activeTimeSeconds));
 
-        const isOnline = d.isOnline !== undefined ? Boolean(d.isOnline) : ((now - lastActiveMs) < 3 * 60 * 1000);
+        // STRICT REAL-TIME HEARTBEAT VERIFICATION:
+        // A session is ONLY online if `d.isOnline` is true AND its last heartbeat was updated within past 20 seconds.
+        const timeSinceLastActiveMs = now - lastActiveMs;
+        const isRecentlyActive = lastActiveMs > 0 && timeSinceLastActiveMs < 20 * 1000;
+        const isOnline = Boolean(d.isOnline) && isRecentlyActive;
         
         let tabStatus: TabStatus = 'Offline';
         if (isOnline) {
@@ -228,8 +236,8 @@ export function subscribeToUserSessions(
         const browser = parseBrowserFromUA(d.userAgent);
         const os = parseOsFromUA(d.userAgent);
 
-        const startTime = d.startTime || new Date(lastActiveMs - durationSeconds * 1000).toISOString();
-        const endTime = d.endTime || (isOnline ? undefined : new Date(lastActiveMs).toISOString());
+        const startTime = d.startTime || (lastActiveMs > 0 ? new Date(lastActiveMs - durationSeconds * 1000).toISOString() : new Date().toISOString());
+        const endTime = d.endTime || (isOnline ? undefined : (lastActiveMs > 0 ? new Date(lastActiveMs).toISOString() : new Date().toISOString()));
 
         sessions.push({
           id: docSnap.id,
@@ -248,7 +256,7 @@ export function subscribeToUserSessions(
           isBounce: durationSeconds < 10,
           startTime,
           endTime,
-          lastActive: new Date(lastActiveMs).toISOString(),
+          lastActive: lastActiveMs > 0 ? new Date(lastActiveMs).toISOString() : new Date().toISOString(),
           isOnline,
           tabStatus
         });
