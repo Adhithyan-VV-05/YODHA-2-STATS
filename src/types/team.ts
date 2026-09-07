@@ -1,6 +1,6 @@
 export type TrackType = 'Healthcare' | 'Environment' | 'AI & Robotics' | 'Cybersecurity' | 'Open Hardware';
 
-export type TeamStatus = 'Verified' | 'Pending Review' | 'Submitted' | 'Shortlisted';
+export type TeamStatus = 'Verified' | 'Pending Review' | 'Submitted' | 'Shortlisted' | 'Rejected';
 
 export type PaymentStatus = 'Pending' | 'Completed' | 'Failed';
 
@@ -57,6 +57,11 @@ export interface SelectedTeam {
   paymentNotes?: string;
   createdAt: string;
   updatedAt?: string;
+  members?: TeamMember[];
+  driveLink?: string;
+  pptLink?: string;
+  problemStatementTitle?: string;
+  shortlistStatus?: 'Shortlisted' | 'Pending' | 'Rejected';
 }
 
 

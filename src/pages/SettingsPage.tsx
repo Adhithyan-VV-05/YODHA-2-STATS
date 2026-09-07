@@ -1,16 +1,17 @@
 import React, { useState } from 'react';
 import { GlassCard } from '../components/common/GlassCard';
-import { Settings, Database, Save, CheckCircle2, Lock, AlertTriangle } from 'lucide-react';
+import { Settings, Database, Save, CheckCircle2, Lock, AlertTriangle, Eye } from 'lucide-react';
 import { useCommandCenter } from '../context/CommandCenterContext';
 import { useAdminAuth } from '../context/AdminAuthContext';
 import { useToast } from '../context/ToastContext';
 
 export const SettingsPage: React.FC = () => {
-  const { isFirebaseConnected, saveAdminPasscodeToFirestore } = useCommandCenter();
+  const { isFirebaseConnected, saveAdminPasscodeToFirestore, metrics, updateTotalVisitorsCount } = useCommandCenter();
   const { adminPasscode, updateAdminPasscode, isAdminAuthenticated, openLoginModal } = useAdminAuth();
   const { showToast } = useToast();
 
   const [newPasscode, setNewPasscode] = useState(adminPasscode);
+  const [totalVisitorsInput, setTotalVisitorsInput] = useState(String(metrics.totalVisits));
 
   const handleSavePasscode = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,6 +34,23 @@ export const SettingsPage: React.FC = () => {
     }
   };
 
+  const handleSaveVisitors = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!isAdminAuthenticated) {
+      showToast('Admin Login Required', 'Log in as admin to update total visitors', 'alert');
+      openLoginModal();
+      return;
+    }
+
+    const count = parseInt(totalVisitorsInput, 10);
+    if (isNaN(count) || count < 0) {
+      showToast('Invalid Visitor Count', 'Please enter a valid positive number', 'alert');
+      return;
+    }
+
+    await updateTotalVisitorsCount(count);
+  };
+
   return (
     <div className="space-y-6 pb-12 font-sans">
       {/* Header */}
@@ -41,7 +59,7 @@ export const SettingsPage: React.FC = () => {
           <Settings className="w-5 h-5 text-slate-700" /> System Settings & Admin Auth
         </h1>
         <p className="text-xs text-slate-500 mt-0.5">
-          Firestore authentication configuration and realtime database connection status
+          Firestore authentication configuration, total visitors counter, and realtime database connection status
         </p>
       </div>
 
@@ -63,21 +81,60 @@ export const SettingsPage: React.FC = () => {
               <span className="text-emerald-700 font-semibold flex items-center gap-1"><CheckCircle2 className="w-3.5 h-3.5" /> Subscribed</span>
             </div>
             <div className="flex items-center justify-between p-2.5 rounded-lg bg-slate-50 border border-slate-200">
-              <span className="text-slate-700">Collection: <code className="text-slate-900 font-semibold font-mono">user_sessions</code></span>
+              <span className="text-slate-700">Collection: <code className="text-slate-900 font-semibold font-mono">selected_teams</code></span>
               <span className="text-emerald-700 font-semibold flex items-center gap-1"><CheckCircle2 className="w-3.5 h-3.5" /> Subscribed</span>
             </div>
             <div className="flex items-center justify-between p-2.5 rounded-lg bg-slate-50 border border-slate-200">
-              <span className="text-slate-700">Document: <code className="text-slate-900 font-semibold font-mono">stats/admin_config</code></span>
+              <span className="text-slate-700">Document: <code className="text-slate-900 font-semibold font-mono">stats/site_analytics</code></span>
               <span className="text-emerald-700 font-semibold flex items-center gap-1"><CheckCircle2 className="w-3.5 h-3.5" /> Synced</span>
             </div>
           </div>
         </GlassCard>
 
-        {/* Admin Passcode Config */}
+        {/* Total Visitors Editor */}
         <GlassCard variant="default" className="p-5 flex flex-col justify-between bg-white border-slate-200 shadow-2xs">
           <div className="border-b border-slate-100 pb-3 mb-4 flex items-center justify-between">
             <h3 className="text-xs font-bold text-slate-900 uppercase flex items-center gap-2">
-              <Lock className="w-4 h-4 text-slate-700" /> Admin Passcode
+              <Eye className="w-4 h-4 text-slate-700" /> Total Visitors So Far
+            </h3>
+            <span className="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 border border-slate-200 font-mono">
+              Current: {metrics.totalVisits}
+            </span>
+          </div>
+
+          <form onSubmit={handleSaveVisitors} className="space-y-4 text-xs">
+            <div>
+              <label className="block text-slate-700 font-medium mb-1">Edit Total Visitor Count in Firestore</label>
+              <input
+                type="number"
+                disabled={!isAdminAuthenticated}
+                value={totalVisitorsInput}
+                onChange={e => setTotalVisitorsInput(e.target.value)}
+                placeholder="Enter visitor count..."
+                className="w-full p-2.5 rounded-lg bg-slate-50 border border-slate-200 text-slate-900 focus:border-slate-400 focus:bg-white outline-none font-mono font-bold disabled:opacity-50"
+              />
+              <p className="text-[11px] text-slate-500 mt-1">
+                Updates <code className="text-slate-800 font-semibold font-mono">stats/site_analytics.totalVisits</code> document.
+              </p>
+            </div>
+
+            <div className="pt-2 flex justify-end">
+              <button
+                type="submit"
+                disabled={!isAdminAuthenticated}
+                className="px-4 py-2 rounded-lg bg-slate-900 text-white font-semibold text-xs hover:bg-slate-800 transition-all flex items-center gap-2 disabled:opacity-40 shadow-xs cursor-pointer"
+              >
+                <Save className="w-4 h-4 text-slate-300" /> Update Visitor Counter
+              </button>
+            </div>
+          </form>
+        </GlassCard>
+
+        {/* Admin Passcode Config */}
+        <GlassCard variant="default" className="p-5 flex flex-col justify-between bg-white border-slate-200 shadow-2xs md:col-span-2">
+          <div className="border-b border-slate-100 pb-3 mb-4 flex items-center justify-between">
+            <h3 className="text-xs font-bold text-slate-900 uppercase flex items-center gap-2">
+              <Lock className="w-4 h-4 text-slate-700" /> Admin Passcode Configuration
             </h3>
             <span className={`text-[11px] font-semibold px-2.5 py-0.5 rounded-full border ${isAdminAuthenticated ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-slate-100 text-slate-600 border-slate-200'}`}>
               {isAdminAuthenticated ? 'Admin Authenticated' : 'Read-Only Mode'}
@@ -129,3 +186,6 @@ export const SettingsPage: React.FC = () => {
     </div>
   );
 };
+
+export default SettingsPage;
+

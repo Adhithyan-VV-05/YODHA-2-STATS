@@ -43,6 +43,24 @@ function parseOsFromUA(ua?: string): OsType {
   return 'Windows';
 }
 
+function sanitizePayload(obj: any): any {
+  if (obj === null || obj === undefined) return '';
+  if (typeof obj !== 'object') return obj;
+
+  if (Array.isArray(obj)) {
+    return obj.map(sanitizePayload);
+  }
+
+  const clean: Record<string, any> = {};
+  for (const key of Object.keys(obj)) {
+    const val = obj[key];
+    if (val !== undefined) {
+      clean[key] = sanitizePayload(val);
+    }
+  }
+  return clean;
+}
+
 export function subscribeToRegistrations(
   db: Firestore, 
   onData: (teams: Team[]) => void, 
@@ -323,12 +341,12 @@ export async function updateFirestoreAdminPasscode(db: Firestore, newPasscode: s
 }
 
 export async function addFirestoreTeam(db: Firestore, team: Team) {
-  const payload = {
+  const payload = sanitizePayload({
     ...team,
     driveLink: team.driveLink || team.pptLink || '',
     pptLink: team.pptLink || team.driveLink || '',
     googleDriveLink: team.driveLink || team.pptLink || ''
-  };
+  });
   await setDoc(doc(db, 'registrations', team.id), payload).catch(() => {});
   await setDoc(doc(db, 'teams', team.id), payload).catch(() => {});
 }
@@ -337,40 +355,40 @@ export async function updateFirestoreTeam(db: Firestore, team: Team) {
   const leaderMember = team.members.find(m => m.role === 'Leader') || team.members[0];
   const regularMembers = team.members.filter(m => m.role !== 'Leader');
 
-  const updatePayload = {
-    teamName: team.name,
-    track: team.track,
-    college: team.college,
-    leaderName: team.leaderName,
-    leaderEmail: team.leaderEmail,
-    leaderPhone: team.leaderPhone,
-    teamSize: team.members.length,
-    status: team.status,
+  const updatePayload = sanitizePayload({
+    teamName: team.name || '',
+    track: team.track || '',
+    college: team.college || '',
+    leaderName: team.leaderName || '',
+    leaderEmail: team.leaderEmail || '',
+    leaderPhone: team.leaderPhone || '',
+    teamSize: team.members ? team.members.length : 1,
+    status: team.status || 'Verified',
     pptLink: team.pptLink || team.driveLink || '',
     driveLink: team.driveLink || team.pptLink || '',
     googleDriveLink: team.driveLink || team.pptLink || '',
     projectDescription: team.projectDescription || '',
     leader: {
-      fullName: leaderMember?.name || team.leaderName,
-      email: leaderMember?.email || team.leaderEmail,
-      phone: leaderMember?.phone || team.leaderPhone,
-      organization: team.college,
+      fullName: leaderMember?.name || team.leaderName || '',
+      email: leaderMember?.email || team.leaderEmail || '',
+      phone: leaderMember?.phone || team.leaderPhone || '',
+      organization: team.college || '',
       yearOfStudy: leaderMember?.year || '3rd Year',
       gender: leaderMember?.gender || 'Male',
       githubUrl: leaderMember?.githubUrl || '',
       driveLink: leaderMember?.driveLink || team.driveLink || ''
     },
-    members: regularMembers.map(m => ({
-      fullName: m.name,
-      email: m.email,
-      phone: m.phone,
-      organization: m.college || team.college,
-      yearOfStudy: m.year,
-      gender: m.gender,
+    members: (regularMembers || []).map(m => ({
+      fullName: m.name || '',
+      email: m.email || '',
+      phone: m.phone || '',
+      organization: m.college || team.college || '',
+      yearOfStudy: m.year || '',
+      gender: m.gender || 'Male',
       githubUrl: m.githubUrl || '',
       driveLink: m.driveLink || ''
     }))
-  };
+  });
 
   try {
     await updateDoc(doc(db, 'registrations', team.id), updatePayload);
@@ -537,7 +555,7 @@ export function subscribeToSelectedTeams(
           leaderPhone: d.leaderPhone || '',
           college: d.college || '',
           track: d.track || '',
-          teamSize: d.teamSize || 4,
+          teamSize: d.teamSize || (d.members ? d.members.length : 4),
           amountToPay: d.amountToPay || '500',
           paymentTime: d.paymentTime || 'Within 48 Hours',
           paymentStatus: (d.paymentStatus as PaymentStatus) || 'Pending',
@@ -545,6 +563,11 @@ export function subscribeToSelectedTeams(
           paymentNotes: d.paymentNotes || '',
           createdAt,
           updatedAt: d.updatedAt ? parseFirestoreDate(d.updatedAt) : undefined,
+          members: d.members || [],
+          driveLink: d.driveLink || d.pptLink || '',
+          pptLink: d.pptLink || d.driveLink || '',
+          problemStatementTitle: d.problemStatementTitle || '',
+          shortlistStatus: d.shortlistStatus || 'Shortlisted',
         });
       });
 
@@ -557,21 +580,99 @@ export function subscribeToSelectedTeams(
   }
 }
 
+export async function toggleFirestoreTeamShortlist(
+  db: Firestore,
+  team: Team,
+  isShortlisted: boolean,
+  customUniqueId?: string
+) {
+  const newStatus: Team['status'] = isShortlisted ? 'Shortlisted' : 'Verified';
+  
+  // 1. Update status in registrations & teams collections
+  await updateFirestoreTeamStatus(db, team.id, newStatus);
+
+  const uniqueTeamId = customUniqueId || `Y26-SEL-${team.id.substring(0, 4).toUpperCase()}-${Math.random().toString(36).substring(2, 5).toUpperCase()}`;
+
+  if (isShortlisted) {
+    // 2. Sync to selected_teams collection
+    const selectedPayload = sanitizePayload({
+      id: uniqueTeamId,
+      uniqueTeamId,
+      teamId: team.id,
+      teamName: team.name || '',
+      leaderName: team.leaderName || '',
+      leaderEmail: team.leaderEmail || '',
+      leaderPhone: team.leaderPhone || '',
+      college: team.college || '',
+      track: team.track || '',
+      teamSize: team.members ? team.members.length : (team.size || 1),
+      amountToPay: '500',
+      paymentTime: 'Within 48 Hours',
+      paymentStatus: 'Pending',
+      createdAt: team.createdAt || new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      members: (team.members || []).map(m => sanitizePayload({
+        id: m.id || '',
+        name: m.name || '',
+        email: m.email || '',
+        phone: m.phone || '',
+        college: m.college || '',
+        year: m.year || '',
+        gender: m.gender || 'Male',
+        githubUrl: m.githubUrl || '',
+        driveLink: m.driveLink || '',
+        role: m.role || 'Member'
+      })),
+      driveLink: team.driveLink || team.pptLink || '',
+      pptLink: team.pptLink || team.driveLink || '',
+      problemStatementTitle: team.problemStatementTitle || '',
+      shortlistStatus: 'Shortlisted'
+    });
+    await setDoc(doc(db, 'selected_teams', uniqueTeamId), selectedPayload, { merge: true });
+  } else {
+    // 3. Remove or update in selected_teams collection
+    await deleteDoc(doc(db, 'selected_teams', uniqueTeamId)).catch(() => {});
+    await deleteDoc(doc(db, 'selected_teams', team.id)).catch(() => {});
+  }
+}
+
+export async function updateTotalVisitsInFirestore(db: Firestore, totalVisits: number) {
+  const docRef = doc(db, 'stats', 'site_analytics');
+  await setDoc(docRef, sanitizePayload({ totalVisits, updatedAt: new Date().toISOString() }), { merge: true });
+}
+
+export async function bulkDeleteFirestoreTeams(db: Firestore, teamIds: string[]) {
+  const promises = teamIds.map(id => deleteFirestoreTeam(db, id));
+  await Promise.all(promises);
+}
+
+export async function bulkDeleteFirestoreSelectedTeams(db: Firestore, ids: string[]) {
+  const promises = ids.map(id => deleteDoc(doc(db, 'selected_teams', id)));
+  await Promise.all(promises);
+}
+
+export async function bulkDeleteFirestoreSessions(db: Firestore, sessionIds: string[]) {
+  const promises = sessionIds.map(id => deleteDoc(doc(db, 'user_sessions', id)));
+  await Promise.all(promises);
+}
+
 export async function addFirestoreSelectedTeam(db: Firestore, selectedTeam: SelectedTeam) {
   const docRef = doc(db, 'selected_teams', selectedTeam.uniqueTeamId || selectedTeam.id);
-  await setDoc(docRef, {
+  const payload = sanitizePayload({
     ...selectedTeam,
     createdAt: selectedTeam.createdAt || new Date().toISOString(),
     updatedAt: new Date().toISOString(),
-  }, { merge: true });
+  });
+  await setDoc(docRef, payload, { merge: true });
 }
 
 export async function updateFirestoreSelectedTeam(db: Firestore, selectedTeam: SelectedTeam) {
   const docRef = doc(db, 'selected_teams', selectedTeam.id || selectedTeam.uniqueTeamId);
-  await setDoc(docRef, {
+  const payload = sanitizePayload({
     ...selectedTeam,
     updatedAt: new Date().toISOString(),
-  }, { merge: true });
+  });
+  await setDoc(docRef, payload, { merge: true });
 }
 
 export async function updateSelectedTeamPaymentStatus(

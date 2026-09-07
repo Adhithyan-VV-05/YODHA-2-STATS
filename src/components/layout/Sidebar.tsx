@@ -27,7 +27,7 @@ export const Sidebar: React.FC = () => {
     { path: '/teams', label: 'Teams', icon: Users, badge: teams.length },
     { path: '/selected-teams', label: 'Selected & Payments', icon: CreditCard, badge: selectedTeams.length || null },
     { path: '/participants', label: 'Participants', icon: UserCheck, badge: null },
-    { path: '/visitors', label: 'Visitors', icon: Eye, badge: sessions.length ? `${sessions.filter(s => s.isOnline).length} Live` : null },
+    { path: '/visitors', label: 'Visitors', icon: Eye, badge: null },
     { path: '/referrals', label: 'Referrals', icon: Gift, badge: null },
     { path: '/analytics', label: 'Analytics', icon: LineChart, badge: null },
     { path: '/exports', label: 'Exports', icon: Download, badge: null },

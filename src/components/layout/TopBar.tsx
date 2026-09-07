@@ -73,13 +73,6 @@ export const TopBar: React.FC = () => {
           />
         </div>
 
-        {/* Online Visitors Counter */}
-        <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 border border-slate-200 text-xs text-slate-700">
-          <Users className="w-3.5 h-3.5 text-slate-500" />
-          <span className="font-semibold text-slate-900">{onlineVisitorsCount}</span>
-          <span className="text-slate-500 text-[11px]">Online</span>
-        </div>
-
         {/* Live Clock (IST) */}
         <div className="hidden lg:flex items-center gap-2 px-3 py-1 rounded-full bg-slate-100 border border-slate-200 text-xs text-slate-700">
           <Clock className="w-3.5 h-3.5 text-slate-500" />

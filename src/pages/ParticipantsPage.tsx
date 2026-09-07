@@ -16,9 +16,7 @@ import {
   Edit3,
   Trash2,
   Calendar,
-  User,
-  ChevronLeft,
-  ChevronRight
+  User
 } from 'lucide-react';
 
 export const ParticipantsPage: React.FC = () => {
@@ -29,9 +27,6 @@ export const ParticipantsPage: React.FC = () => {
   const [trackFilter, setTrackFilter] = useState('All');
   const [roleFilter, setRoleFilter] = useState('All');
   const [editingTeam, setEditingTeam] = useState<Team | null>(null);
-
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 12;
 
   const filtered = participants.filter(p => {
     const matchesSearch =
@@ -45,9 +40,6 @@ export const ParticipantsPage: React.FC = () => {
 
     return matchesSearch && matchesTrack && matchesRole;
   });
-
-  const totalPages = Math.ceil(filtered.length / itemsPerPage) || 1;
-  const paginatedParticipants = filtered.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
   const handleEditParticipantTeam = (teamId: string) => {
     const foundTeam = teams.find(t => t.id === teamId);
@@ -74,7 +66,7 @@ export const ParticipantsPage: React.FC = () => {
           <UserCheck className="w-5 h-5 text-slate-700" /> Participant Directory
         </h1>
         <p className="text-xs text-slate-500 mt-0.5">
-          Inspect and manage {participants.length} registered hackathon participants
+          Inspect and manage {participants.length} registered hackathon participants (Time Ordered)
         </p>
       </div>
 
@@ -85,7 +77,7 @@ export const ParticipantsPage: React.FC = () => {
           <input
             type="text"
             value={search}
-            onChange={e => { setSearch(e.target.value); setCurrentPage(1); }}
+            onChange={e => setSearch(e.target.value)}
             placeholder="Search Participant Name, Email, College, Team..."
             className="w-full pl-9 pr-4 py-2 rounded-lg bg-slate-50 border border-slate-200 text-slate-800 text-xs focus:border-slate-400 focus:bg-white outline-none font-sans"
           />
@@ -96,7 +88,7 @@ export const ParticipantsPage: React.FC = () => {
             <Filter className="w-3.5 h-3.5 text-slate-400" /> Track:
             <select
               value={trackFilter}
-              onChange={e => { setTrackFilter(e.target.value); setCurrentPage(1); }}
+              onChange={e => setTrackFilter(e.target.value)}
               className="bg-slate-50 border border-slate-200 text-slate-800 rounded-md px-2.5 py-1.5 text-xs outline-none font-sans"
             >
               <option value="All">All Tracks</option>
@@ -112,7 +104,7 @@ export const ParticipantsPage: React.FC = () => {
             Role:
             <select
               value={roleFilter}
-              onChange={e => { setRoleFilter(e.target.value); setCurrentPage(1); }}
+              onChange={e => setRoleFilter(e.target.value)}
               className="bg-slate-50 border border-slate-200 text-slate-800 rounded-md px-2.5 py-1.5 text-xs outline-none font-sans"
             >
               <option value="All">All Roles</option>
@@ -123,24 +115,24 @@ export const ParticipantsPage: React.FC = () => {
         </div>
       </GlassCard>
 
-      {/* GRID OF PARTICIPANT CARDS */}
-      {paginatedParticipants.length === 0 ? (
+      {/* GRID OF PARTICIPANT CARDS - FULL LIST */}
+      {filtered.length === 0 ? (
         <div className="p-12 text-center text-slate-400 text-xs font-sans border border-slate-200 rounded-xl bg-white">
           No participant records found in Firestore.
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-          {paginatedParticipants.map(p => (
+          {filtered.map((p, index) => (
             <GlassCard
               key={p.id}
               variant="default"
-              className="p-4 flex flex-col justify-between hover:border-slate-300 transition-all bg-white border-slate-200 group shadow-2xs"
+              className="p-4 flex flex-col justify-between hover:border-slate-300 transition-all bg-white border-slate-200 group shadow-2xs relative"
             >
               <div>
                 {/* Top Card Header */}
                 <div className="flex items-start gap-3 border-b border-slate-100 pb-3 mb-3">
-                  <div className="w-10 h-10 rounded-lg bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-700 shrink-0">
-                    <User className="w-5 h-5" />
+                  <div className="w-10 h-10 rounded-lg bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-700 shrink-0 font-mono font-bold text-xs">
+                    #{index + 1}
                   </div>
 
                   <div className="flex-1 min-w-0">
@@ -170,11 +162,11 @@ export const ParticipantsPage: React.FC = () => {
                     <Mail className="w-3.5 h-3.5 text-slate-400 shrink-0" />
                     <span className="truncate">{p.email}</span>
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 font-mono">
                     <Phone className="w-3.5 h-3.5 text-slate-400 shrink-0" />
                     <span>{p.phone}</span>
                   </div>
-                  <div className="flex items-center gap-2 text-[11px] text-slate-400 pt-1">
+                  <div className="flex items-center gap-2 text-[11px] text-slate-400 font-mono pt-1">
                     <Calendar className="w-3 h-3 text-slate-400 shrink-0" />
                     <span>Registered: {formatISTDateTime(p.registeredAt)}</span>
                   </div>
@@ -221,31 +213,6 @@ export const ParticipantsPage: React.FC = () => {
         </div>
       )}
 
-      {/* Pagination Footer */}
-      {totalPages > 1 && (
-        <div className="flex items-center justify-between pt-4 mt-2 border-t border-slate-100 text-xs">
-          <span className="text-slate-500">
-            Showing page {currentPage} of {totalPages}
-          </span>
-          <div className="flex items-center gap-2">
-            <button
-              disabled={currentPage === 1}
-              onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-              className="p-1.5 rounded-md bg-slate-100 border border-slate-200 text-slate-700 disabled:opacity-40 cursor-pointer"
-            >
-              <ChevronLeft className="w-4 h-4" />
-            </button>
-            <button
-              disabled={currentPage === totalPages}
-              onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-              className="p-1.5 rounded-md bg-slate-100 border border-slate-200 text-slate-700 disabled:opacity-40 cursor-pointer"
-            >
-              <ChevronRight className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
-      )}
-
       {/* Edit Modal */}
       <EditTeamModal
         team={editingTeam}
@@ -258,3 +225,6 @@ export const ParticipantsPage: React.FC = () => {
     </div>
   );
 };
+
+export default ParticipantsPage;
+

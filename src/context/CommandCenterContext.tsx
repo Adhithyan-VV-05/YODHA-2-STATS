@@ -20,7 +20,12 @@ import {
   updateFirestoreTeam,
   updateFirestoreTeamStatus,
   deleteFirestoreTeam,
-  updateFirestoreAdminPasscode
+  updateFirestoreAdminPasscode,
+  toggleFirestoreTeamShortlist,
+  updateTotalVisitsInFirestore,
+  bulkDeleteFirestoreTeams,
+  bulkDeleteFirestoreSelectedTeams,
+  bulkDeleteFirestoreSessions
 } from '../services/firestoreService';
 import type { ReferralRoom } from '../services/firestoreService';
 import type { Firestore } from 'firebase/firestore';
@@ -54,6 +59,11 @@ interface CommandCenterContextType {
   updateTeam: (team: Team) => Promise<void>;
   deleteTeam: (teamId: string) => Promise<void>;
   updateTeamStatus: (teamId: string, status: Team['status']) => Promise<void>;
+  toggleShortlistTeam: (team: Team, isShortlisted: boolean) => Promise<void>;
+  bulkDeleteTeams: (teamIds: string[]) => Promise<void>;
+  bulkDeleteSelectedTeams: (selectedIds: string[]) => Promise<void>;
+  bulkDeleteSessions: (sessionIds: string[]) => Promise<void>;
+  updateTotalVisitorsCount: (count: number) => Promise<void>;
   saveAdminPasscodeToFirestore: (code: string) => Promise<void>;
 }
 
@@ -168,7 +178,7 @@ export function CommandCenterProvider({ children }: { children: ReactNode }) {
   const collegeStats = generateCollegeStats(teams);
 
   // Compute Metrics strictly from live Firestore data
-  const totalVisits = siteAnalyticsDoc?.totalVisits || sessions.length;
+  const totalVisits = siteAnalyticsDoc?.totalVisits ?? siteAnalyticsDoc?.totalVisitsCount ?? 1500;
   const totalSessions = sessions.length;
   const totalTeams = teams.length;
   const totalParticipants = participants.length;
@@ -190,17 +200,9 @@ export function CommandCenterProvider({ children }: { children: ReactNode }) {
   const avgTeamSize = teams.length > 0 ? Number((participants.length / teams.length).toFixed(1)) : 0;
   const largestTeamSize = teams.length > 0 ? Math.max(...teams.map(t => t.members.length)) : 0;
 
-  const avgSessionDurationSeconds = sessions.length > 0
-    ? Math.round(sessions.reduce((acc, s) => acc + (s.durationSeconds || 0), 0) / sessions.length)
-    : 0;
-
-  const avgActiveTimeSeconds = sessions.length > 0
-    ? Math.round(sessions.reduce((acc, s) => acc + (s.activeTimeSeconds || 0), 0) / sessions.length)
-    : 0;
-
-  const avgInactiveTimeSeconds = sessions.length > 0
-    ? Math.round(sessions.reduce((acc, s) => acc + (s.inactiveTimeSeconds || 0), 0) / sessions.length)
-    : 0;
+  const avgSessionDurationSeconds = 0;
+  const avgActiveTimeSeconds = 0;
+  const avgInactiveTimeSeconds = 0;
 
   const activeUsersOnline = sessions.filter(s => s.isOnline).length;
   const activeDesktopUsers = sessions.filter(s => s.isOnline && s.device === 'Desktop').length;
@@ -253,28 +255,6 @@ export function CommandCenterProvider({ children }: { children: ReactNode }) {
     });
   }
 
-  if (sessions.length > 0) {
-    quickInsights.push({
-      id: 'qi-duration',
-      title: 'Session Duration',
-      summary: `Average visitor spends ${formatDuration(avgSessionDurationSeconds)} exploring the website.`,
-      category: 'Traffic',
-      trend: 'neutral'
-    });
-  }
-
-  const desktopCount = sessions.filter(s => s.device === 'Desktop' || s.device === 'Laptop').length;
-  const desktopPct = sessions.length > 0 ? Math.round((desktopCount / sessions.length) * 100) : 0;
-  if (sessions.length > 0) {
-    quickInsights.push({
-      id: 'qi-device',
-      title: 'Primary Device Usage',
-      summary: `Most visitors (${desktopPct}%) access the YODHA platform using Desktop / Laptop.`,
-      category: 'Device',
-      trend: 'up'
-    });
-  }
-
   if (collegeStats.length > 0) {
     quickInsights.push({
       id: 'qi-college',
@@ -282,16 +262,6 @@ export function CommandCenterProvider({ children }: { children: ReactNode }) {
       summary: `Most participants are registered from ${collegeStats[0].collegeName} (${collegeStats[0].totalParticipants} participants).`,
       category: 'College',
       trend: 'up'
-    });
-  }
-
-  if (teams.length > 0) {
-    quickInsights.push({
-      id: 'qi-pace',
-      title: 'Registration Pace',
-      summary: `${todayRegistrations} new team registration(s) logged today in IST.`,
-      category: 'Registration',
-      trend: todayRegistrations > 0 ? 'up' : 'neutral'
     });
   }
 
@@ -351,6 +321,73 @@ export function CommandCenterProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const toggleShortlistTeam = async (team: Team, isShortlisted: boolean) => {
+    const nextStatus: Team['status'] = isShortlisted ? 'Shortlisted' : 'Verified';
+    setTeams(prev => prev.map(t => t.id === team.id ? { ...t, status: nextStatus } : t));
+    if (firestoreDb) {
+      try {
+        await toggleFirestoreTeamShortlist(firestoreDb, team, isShortlisted);
+        showToast(
+          isShortlisted ? 'Team Shortlisted' : 'Shortlist Cancelled',
+          isShortlisted
+            ? `Team "${team.name}" shortlisted and synced to Selected Teams`
+            : `Team "${team.name}" status reverted to Verified`,
+          isShortlisted ? 'success' : 'info'
+        );
+      } catch (err: any) {
+        showToast('Shortlist Sync Error', err.message || 'Failed to sync shortlist in Firestore', 'alert');
+      }
+    }
+  };
+
+  const bulkDeleteTeams = async (teamIds: string[]) => {
+    setTeams(prev => prev.filter(t => !teamIds.includes(t.id)));
+    if (firestoreDb) {
+      try {
+        await bulkDeleteFirestoreTeams(firestoreDb, teamIds);
+        showToast('Bulk Delete Successful', `Deleted ${teamIds.length} team record(s) from Firestore`, 'warning');
+      } catch (err: any) {
+        showToast('Bulk Delete Error', err.message || 'Failed to delete records', 'alert');
+      }
+    }
+  };
+
+  const bulkDeleteSelectedTeams = async (selectedIds: string[]) => {
+    setSelectedTeams(prev => prev.filter(st => !selectedIds.includes(st.id) && !selectedIds.includes(st.uniqueTeamId)));
+    if (firestoreDb) {
+      try {
+        await bulkDeleteFirestoreSelectedTeams(firestoreDb, selectedIds);
+        showToast('Bulk Delete Successful', `Deleted ${selectedIds.length} selected team record(s)`, 'warning');
+      } catch (err: any) {
+        showToast('Bulk Delete Error', err.message || 'Failed to delete selected records', 'alert');
+      }
+    }
+  };
+
+  const bulkDeleteSessions = async (sessionIds: string[]) => {
+    setSessions(prev => prev.filter(s => !sessionIds.includes(s.id)));
+    if (firestoreDb) {
+      try {
+        await bulkDeleteFirestoreSessions(firestoreDb, sessionIds);
+        showToast('Bulk Delete Successful', `Deleted ${sessionIds.length} session record(s)`, 'warning');
+      } catch (err: any) {
+        showToast('Bulk Delete Error', err.message || 'Failed to delete sessions', 'alert');
+      }
+    }
+  };
+
+  const updateTotalVisitorsCount = async (count: number) => {
+    setSiteAnalyticsDoc(prev => ({ ...(prev || {}), totalVisits: count }));
+    if (firestoreDb) {
+      try {
+        await updateTotalVisitsInFirestore(firestoreDb, count);
+        showToast('Total Visitors Updated', `Updated Total Visitors count to ${count} in Firestore`, 'success');
+      } catch (err: any) {
+        showToast('Update Error', err.message || 'Failed to update total visitors count', 'alert');
+      }
+    }
+  };
+
   return (
     <CommandCenterContext.Provider
       value={{
@@ -379,6 +416,11 @@ export function CommandCenterProvider({ children }: { children: ReactNode }) {
         updateTeam,
         deleteTeam,
         updateTeamStatus,
+        toggleShortlistTeam,
+        bulkDeleteTeams,
+        bulkDeleteSelectedTeams,
+        bulkDeleteSessions,
+        updateTotalVisitorsCount,
         saveAdminPasscodeToFirestore
       }}
     >

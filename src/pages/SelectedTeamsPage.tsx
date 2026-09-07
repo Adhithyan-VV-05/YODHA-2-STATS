@@ -29,12 +29,15 @@ import {
 } from '../services/firestoreService';
 
 export const SelectedTeamsPage: React.FC = () => {
-  const { selectedTeams, teams, firestoreDb } = useCommandCenter();
+  const { selectedTeams, teams, firestoreDb, bulkDeleteSelectedTeams } = useCommandCenter();
   const { showToast } = useToast();
 
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [statusFilter, setStatusFilter] = useState<'All' | 'Pending' | 'Completed'>('All');
   const [copiedId, setCopiedId] = useState<string | null>(null);
+
+  // Multi-select state
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
   // Modal State
   const [isAddModalOpen, setIsAddModalOpen] = useState<boolean>(false);
@@ -193,6 +196,28 @@ export const SelectedTeamsPage: React.FC = () => {
     return matchesSearch && matchesStatus;
   });
 
+  const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.checked) {
+      setSelectedIds(filteredTeams.map(st => st.id || st.uniqueTeamId));
+    } else {
+      setSelectedIds([]);
+    }
+  };
+
+  const handleToggleSelectRow = (id: string) => {
+    setSelectedIds(prev =>
+      prev.includes(id) ? prev.filter(item => item !== id) : [...prev, id]
+    );
+  };
+
+  const handleBulkDeleteSelected = async () => {
+    if (selectedIds.length === 0) return;
+    if (window.confirm(`Are you sure you want to delete ${selectedIds.length} selected team(s)?`)) {
+      await bulkDeleteSelectedTeams(selectedIds);
+      setSelectedIds([]);
+    }
+  };
+
   // Calculate Metrics
   const totalCount = selectedTeams.length;
   const pendingCount = selectedTeams.filter((s) => s.paymentStatus === 'Pending').length;
@@ -285,31 +310,42 @@ export const SelectedTeamsPage: React.FC = () => {
           />
         </div>
 
-        <div className="flex items-center gap-1.5 w-full sm:w-auto overflow-x-auto">
-          {(['All', 'Pending', 'Completed'] as const).map((st) => (
+        <div className="flex items-center gap-2 flex-wrap">
+          {selectedIds.length > 0 && (
             <button
-              key={st}
-              onClick={() => setStatusFilter(st)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer ${
-                statusFilter === st
-                  ? 'bg-slate-900 text-white shadow-xs'
-                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-              }`}
+              onClick={handleBulkDeleteSelected}
+              className="px-3.5 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-medium text-xs shadow-xs transition-all cursor-pointer flex items-center gap-1.5"
             >
-              {st}
+              <Trash2 className="w-3.5 h-3.5" /> Delete Selected ({selectedIds.length})
             </button>
-          ))}
+          )}
+
+          <div className="flex items-center gap-1.5 overflow-x-auto">
+            {(['All', 'Pending', 'Completed'] as const).map((st) => (
+              <button
+                key={st}
+                onClick={() => setStatusFilter(st)}
+                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer ${
+                  statusFilter === st
+                    ? 'bg-slate-900 text-white shadow-xs'
+                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                }`}
+              >
+                {st}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
-      {/* TABLE SECTION */}
+      {/* TABLE SECTION - FULL LIST, S.NO TIME ORDERED, MULTI-SELECT */}
       <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
         {filteredTeams.length === 0 ? (
           <div className="p-12 text-center space-y-3">
             <AlertCircle className="w-8 h-8 text-slate-400 mx-auto" />
-            <p className="text-sm font-medium text-slate-600">No selected teams found.</p>
+            <p className="text-sm font-medium text-slate-600">No shortlisted / selected teams found.</p>
             <p className="text-xs text-slate-400 max-w-sm mx-auto">
-              Click "Add / Select Team" above to select a team from registration records or enter a new shortlisted team.
+              Shortlist a team from the Teams tab or click "Add / Select Team" above to create a entry.
             </p>
           </div>
         ) : (
@@ -317,120 +353,150 @@ export const SelectedTeamsPage: React.FC = () => {
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="bg-slate-50 border-b border-slate-200 text-[11px] font-semibold text-slate-500 uppercase tracking-wider">
+                  <th className="py-3.5 px-4 w-10 text-center">
+                    <input
+                      type="checkbox"
+                      checked={filteredTeams.length > 0 && selectedIds.length === filteredTeams.length}
+                      onChange={handleSelectAll}
+                      className="rounded border-slate-300 text-slate-900 focus:ring-0 cursor-pointer"
+                    />
+                  </th>
+                  <th className="py-3.5 px-4 w-12 text-slate-400">#</th>
                   <th className="py-3.5 px-4">Unique Team ID</th>
                   <th className="py-3.5 px-4">Team Name</th>
                   <th className="py-3.5 px-4">Leader Details</th>
                   <th className="py-3.5 px-4">Amount</th>
                   <th className="py-3.5 px-4">Payment Time</th>
-                  <th className="py-3.5 px-4">Status</th>
+                  <th className="py-3.5 px-4">Payment Status</th>
                   <th className="py-3.5 px-4 text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-200 text-xs text-slate-700 font-medium">
-                {filteredTeams.map((st) => (
-                  <tr key={st.id || st.uniqueTeamId} className="hover:bg-slate-50/70 transition-colors">
-                    {/* UNIQUE TEAM ID */}
-                    <td className="py-3.5 px-4 font-mono font-semibold text-slate-900 whitespace-nowrap">
-                      <div className="flex items-center gap-1.5">
-                        <span className="bg-slate-100 text-slate-800 px-2 py-0.5 rounded border border-slate-200">
-                          {st.uniqueTeamId}
-                        </span>
+                {filteredTeams.map((st, index) => {
+                  const isSelected = selectedIds.includes(st.id) || selectedIds.includes(st.uniqueTeamId);
+                  return (
+                    <tr
+                      key={st.id || st.uniqueTeamId}
+                      className={`transition-colors ${isSelected ? 'bg-slate-100/70' : 'hover:bg-slate-50/70'}`}
+                    >
+                      {/* Checkbox */}
+                      <td className="py-3.5 px-4 text-center">
+                        <input
+                          type="checkbox"
+                          checked={isSelected}
+                          onChange={() => handleToggleSelectRow(st.id || st.uniqueTeamId)}
+                          className="rounded border-slate-300 text-slate-900 focus:ring-0 cursor-pointer"
+                        />
+                      </td>
+
+                      {/* S.No */}
+                      <td className="py-3.5 px-4 font-mono font-bold text-slate-400 text-xs">
+                        {index + 1}
+                      </td>
+
+                      {/* UNIQUE TEAM ID */}
+                      <td className="py-3.5 px-4 font-mono font-semibold text-slate-900 whitespace-nowrap">
+                        <div className="flex items-center gap-1.5">
+                          <span className="bg-slate-900 text-white px-2 py-0.5 rounded border border-slate-800 shadow-2xs">
+                            {st.uniqueTeamId}
+                          </span>
+                          <button
+                            onClick={() => handleCopyLink(st)}
+                            title="Copy Payment Portal URL"
+                            className="p-1 text-slate-400 hover:text-slate-700 transition-colors cursor-pointer"
+                          >
+                            {copiedId === st.uniqueTeamId ? (
+                              <Check className="w-3.5 h-3.5 text-emerald-600" />
+                            ) : (
+                              <Copy className="w-3.5 h-3.5" />
+                            )}
+                          </button>
+                        </div>
+                      </td>
+
+                      {/* TEAM NAME */}
+                      <td className="py-3.5 px-4 font-bold text-slate-900">
+                        <div>{st.teamName}</div>
+                        {st.track && (
+                          <span className="text-[10px] text-slate-400 font-normal block">{st.track}</span>
+                        )}
+                      </td>
+
+                      {/* LEADER DETAILS */}
+                      <td className="py-3.5 px-4">
+                        <div className="space-y-0.5">
+                          <div className="font-semibold text-slate-900">{st.leaderName}</div>
+                          <div className="text-[11px] text-slate-500 font-mono">{st.leaderEmail}</div>
+                          {st.leaderPhone && (
+                            <div className="text-[10px] text-slate-400 font-mono">{st.leaderPhone}</div>
+                          )}
+                        </div>
+                      </td>
+
+                      {/* AMOUNT */}
+                      <td className="py-3.5 px-4 font-bold text-slate-900 whitespace-nowrap">
+                        ₹{st.amountToPay}
+                      </td>
+
+                      {/* PAYMENT TIME */}
+                      <td className="py-3.5 px-4 text-slate-600 font-mono whitespace-nowrap">
+                        {st.paymentTime}
+                      </td>
+
+                      {/* STATUS */}
+                      <td className="py-3.5 px-4 whitespace-nowrap">
                         <button
-                          onClick={() => handleCopyLink(st)}
-                          title="Copy Payment Portal URL"
-                          className="p-1 text-slate-400 hover:text-slate-700 transition-colors cursor-pointer"
+                          onClick={() => handleToggleStatus(st)}
+                          title="Click to toggle payment status"
+                          className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold cursor-pointer transition-all ${
+                            st.paymentStatus === 'Completed'
+                              ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                              : 'bg-amber-50 text-amber-700 border border-amber-200'
+                          }`}
                         >
-                          {copiedId === st.uniqueTeamId ? (
-                            <Check className="w-3.5 h-3.5 text-emerald-600" />
+                          {st.paymentStatus === 'Completed' ? (
+                            <>
+                              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                              <span>Completed</span>
+                            </>
                           ) : (
-                            <Copy className="w-3.5 h-3.5" />
+                            <>
+                              <Clock className="w-3.5 h-3.5 text-amber-600" />
+                              <span>Pending</span>
+                            </>
                           )}
                         </button>
-                      </div>
-                    </td>
+                      </td>
 
-                    {/* TEAM NAME */}
-                    <td className="py-3.5 px-4 font-bold text-slate-900">
-                      <div>{st.teamName}</div>
-                      {st.track && (
-                        <span className="text-[10px] text-slate-400 font-normal block">{st.track}</span>
-                      )}
-                    </td>
-
-                    {/* LEADER DETAILS */}
-                    <td className="py-3.5 px-4">
-                      <div className="space-y-0.5">
-                        <div className="font-semibold text-slate-900">{st.leaderName}</div>
-                        <div className="text-[11px] text-slate-500 font-mono">{st.leaderEmail}</div>
-                        {st.leaderPhone && (
-                          <div className="text-[10px] text-slate-400 font-mono">{st.leaderPhone}</div>
-                        )}
-                      </div>
-                    </td>
-
-                    {/* AMOUNT */}
-                    <td className="py-3.5 px-4 font-bold text-slate-900 whitespace-nowrap">
-                      ₹{st.amountToPay}
-                    </td>
-
-                    {/* PAYMENT TIME */}
-                    <td className="py-3.5 px-4 text-slate-600 font-mono whitespace-nowrap">
-                      {st.paymentTime}
-                    </td>
-
-                    {/* STATUS */}
-                    <td className="py-3.5 px-4 whitespace-nowrap">
-                      <button
-                        onClick={() => handleToggleStatus(st)}
-                        title="Click to toggle status"
-                        className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold cursor-pointer transition-all ${
-                          st.paymentStatus === 'Completed'
-                            ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                            : 'bg-amber-50 text-amber-700 border border-amber-200'
-                        }`}
-                      >
-                        {st.paymentStatus === 'Completed' ? (
-                          <>
-                            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                            <span>Completed</span>
-                          </>
-                        ) : (
-                          <>
-                            <Clock className="w-3.5 h-3.5 text-amber-600" />
-                            <span>Pending</span>
-                          </>
-                        )}
-                      </button>
-                    </td>
-
-                    {/* ACTIONS */}
-                    <td className="py-3.5 px-4 text-right whitespace-nowrap">
-                      <div className="flex items-center justify-end gap-2">
-                        <button
-                          onClick={() => handleCopyLink(st)}
-                          title="Copy Link"
-                          className="p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 transition-colors cursor-pointer"
-                        >
-                          <ExternalLink className="w-3.5 h-3.5" />
-                        </button>
-                        <button
-                          onClick={() => handleOpenEditModal(st)}
-                          title="Edit Details"
-                          className="p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 transition-colors cursor-pointer"
-                        >
-                          <Edit2 className="w-3.5 h-3.5" />
-                        </button>
-                        <button
-                          onClick={() => handleDelete(st)}
-                          title="Delete"
-                          className="p-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-600 transition-colors cursor-pointer"
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+                      {/* ACTIONS */}
+                      <td className="py-3.5 px-4 text-right whitespace-nowrap">
+                        <div className="flex items-center justify-end gap-2">
+                          <button
+                            onClick={() => handleCopyLink(st)}
+                            title="Copy Portal Link"
+                            className="p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 transition-colors cursor-pointer"
+                          >
+                            <ExternalLink className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            onClick={() => handleOpenEditModal(st)}
+                            title="Edit Details"
+                            className="p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 transition-colors cursor-pointer"
+                          >
+                            <Edit2 className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            onClick={() => handleDelete(st)}
+                            title="Delete"
+                            className="p-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-600 transition-colors cursor-pointer"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
