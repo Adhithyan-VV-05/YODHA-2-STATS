@@ -51,7 +51,7 @@ export const SelectedTeamsPage: React.FC = () => {
   const [leaderPhone, setLeaderPhone] = useState<string>('');
   const [college, setCollege] = useState<string>('');
   const [track, setTrack] = useState<string>('Healthcare');
-  const [amountToPay, setAmountToPay] = useState<string>('500');
+  const [amountToPay, setAmountToPay] = useState<string>('700');
   const [paymentTime, setPaymentTime] = useState<string>('Within 48 Hours');
   const [paymentStatus, setPaymentStatus] = useState<PaymentStatus>('Pending');
   const [paymentNotes, setPaymentNotes] = useState<string>('');
@@ -80,7 +80,7 @@ export const SelectedTeamsPage: React.FC = () => {
     setLeaderPhone('');
     setCollege('Jyothi Engineering College (Autonomous)');
     setTrack('Healthcare');
-    setAmountToPay('500');
+    setAmountToPay('700');
     setPaymentTime('Within 48 Hours');
     setPaymentStatus('Pending');
     setPaymentNotes('');
@@ -124,7 +124,7 @@ export const SelectedTeamsPage: React.FC = () => {
       leaderPhone: leaderPhone.trim(),
       college: college.trim(),
       track,
-      amountToPay: amountToPay.trim() || '500',
+      amountToPay: amountToPay.trim() || '700',
       paymentTime: paymentTime.trim() || 'Within 48 Hours',
       paymentStatus,
       paymentNotes: paymentNotes.trim(),
