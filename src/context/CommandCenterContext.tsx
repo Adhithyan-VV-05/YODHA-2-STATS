@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import type { ReactNode } from 'react';
-import type { Team } from '../types/team';
+import type { Team, SelectedTeam } from '../types/team';
 import type { Participant } from '../types/participant';
 import type { VisitorSession } from '../types/session';
 import type { ActivityEvent } from '../types/activity';
@@ -16,6 +16,7 @@ import {
   subscribeToSiteAnalytics,
   subscribeToAdminPasscode,
   subscribeToReferralRooms,
+  subscribeToSelectedTeams,
   updateFirestoreTeam,
   updateFirestoreTeamStatus,
   deleteFirestoreTeam,
@@ -29,6 +30,7 @@ import { formatISTDateTime, formatDuration } from '../utils/formatters';
 
 interface CommandCenterContextType {
   teams: Team[];
+  selectedTeams: SelectedTeam[];
   participants: Participant[];
   sessions: VisitorSession[];
   activities: ActivityEvent[];
@@ -66,6 +68,7 @@ export function CommandCenterProvider({ children }: { children: ReactNode }) {
   const [isFirebaseConnected, setIsFirebaseConnected] = useState<boolean>(false);
 
   const [teams, setTeams] = useState<Team[]>([]);
+  const [selectedTeams, setSelectedTeams] = useState<SelectedTeam[]>([]);
   const [sessions, setSessions] = useState<VisitorSession[]>([]);
   const [activities, setActivities] = useState<ActivityEvent[]>([]);
   const [referralRooms, setReferralRooms] = useState<ReferralRoom[]>([]);
@@ -110,6 +113,14 @@ export function CommandCenterProvider({ children }: { children: ReactNode }) {
         }
       );
 
+      const unsubSelected = subscribeToSelectedTeams(
+        db,
+        (liveSelected) => {
+          setSelectedTeams(liveSelected);
+        },
+        () => {}
+      );
+
       const unsubSess = subscribeToUserSessions(
         db,
         (liveSessions) => {
@@ -144,6 +155,7 @@ export function CommandCenterProvider({ children }: { children: ReactNode }) {
 
       return () => {
         unsubReg();
+        unsubSelected();
         unsubSess();
         unsubStats();
         unsubPasscode();
@@ -343,6 +355,7 @@ export function CommandCenterProvider({ children }: { children: ReactNode }) {
     <CommandCenterContext.Provider
       value={{
         teams,
+        selectedTeams,
         participants,
         sessions,
         activities,

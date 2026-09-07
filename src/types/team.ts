@@ -2,6 +2,8 @@ export type TrackType = 'Healthcare' | 'Environment' | 'AI & Robotics' | 'Cybers
 
 export type TeamStatus = 'Verified' | 'Pending Review' | 'Submitted' | 'Shortlisted';
 
+export type PaymentStatus = 'Pending' | 'Completed' | 'Failed';
+
 export interface TeamMember {
   id: string;
   name: string;
@@ -36,4 +38,25 @@ export interface Team {
   githubRepo?: string;
   projectDescription?: string;
 }
+
+export interface SelectedTeam {
+  id: string;
+  uniqueTeamId: string;
+  teamId?: string;
+  teamName: string;
+  leaderName: string;
+  leaderEmail: string;
+  leaderPhone: string;
+  college?: string;
+  track?: string;
+  teamSize?: number;
+  amountToPay: string | number;
+  paymentTime: string;
+  paymentStatus: PaymentStatus;
+  paymentTxnId?: string;
+  paymentNotes?: string;
+  createdAt: string;
+  updatedAt?: string;
+}
+
 

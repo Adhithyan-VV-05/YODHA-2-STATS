@@ -11,6 +11,7 @@ import { AdminLockGate } from './components/common/AdminLockGate';
 
 import { DashboardPage } from './pages/DashboardPage';
 import { TeamsPage } from './pages/TeamsPage';
+import { SelectedTeamsPage } from './pages/SelectedTeamsPage';
 import { ParticipantsPage } from './pages/ParticipantsPage';
 import { VisitorsPage } from './pages/VisitorsPage';
 import { AnalyticsPage } from './pages/AnalyticsPage';
@@ -42,6 +43,7 @@ function AppContent() {
             <Routes>
               <Route path="/" element={<DashboardPage />} />
               <Route path="/teams" element={<TeamsPage />} />
+              <Route path="/selected-teams" element={<SelectedTeamsPage />} />
               <Route path="/participants" element={<ParticipantsPage />} />
               <Route path="/visitors" element={<VisitorsPage />} />
               <Route path="/referrals" element={<ReferralsPage />} />

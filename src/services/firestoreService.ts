@@ -508,3 +508,93 @@ export function subscribeToRoomReferrals(
     return () => {};
   }
 }
+
+export function subscribeToSelectedTeams(
+  db: Firestore,
+  onData: (teams: SelectedTeam[]) => void,
+  onError: (err: any) => void
+) {
+  try {
+    const q = query(collection(db, 'selected_teams'));
+    return onSnapshot(q, (snapshot) => {
+      const selectedList: SelectedTeam[] = [];
+      snapshot.forEach((docSnap) => {
+        const d = docSnap.data();
+        let createdAt = new Date().toISOString();
+        if (d.createdAt && d.createdAt.seconds) {
+          createdAt = new Date(d.createdAt.seconds * 1000).toISOString();
+        } else if (d.createdAt) {
+          createdAt = d.createdAt;
+        }
+
+        selectedList.push({
+          id: docSnap.id,
+          uniqueTeamId: d.uniqueTeamId || docSnap.id,
+          teamId: d.teamId || docSnap.id,
+          teamName: d.teamName || 'Unknown Team',
+          leaderName: d.leaderName || 'Unknown Leader',
+          leaderEmail: d.leaderEmail || '',
+          leaderPhone: d.leaderPhone || '',
+          college: d.college || '',
+          track: d.track || '',
+          teamSize: d.teamSize || 4,
+          amountToPay: d.amountToPay || '500',
+          paymentTime: d.paymentTime || 'Within 48 Hours',
+          paymentStatus: (d.paymentStatus as PaymentStatus) || 'Pending',
+          paymentTxnId: d.paymentTxnId || '',
+          paymentNotes: d.paymentNotes || '',
+          createdAt,
+          updatedAt: d.updatedAt ? parseFirestoreDate(d.updatedAt) : undefined,
+        });
+      });
+
+      selectedList.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+      onData(selectedList);
+    }, onError);
+  } catch (err) {
+    onError(err);
+    return () => {};
+  }
+}
+
+export async function addFirestoreSelectedTeam(db: Firestore, selectedTeam: SelectedTeam) {
+  const docRef = doc(db, 'selected_teams', selectedTeam.uniqueTeamId || selectedTeam.id);
+  await setDoc(docRef, {
+    ...selectedTeam,
+    createdAt: selectedTeam.createdAt || new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  }, { merge: true });
+}
+
+export async function updateFirestoreSelectedTeam(db: Firestore, selectedTeam: SelectedTeam) {
+  const docRef = doc(db, 'selected_teams', selectedTeam.id || selectedTeam.uniqueTeamId);
+  await setDoc(docRef, {
+    ...selectedTeam,
+    updatedAt: new Date().toISOString(),
+  }, { merge: true });
+}
+
+export async function updateSelectedTeamPaymentStatus(
+  db: Firestore, 
+  id: string, 
+  paymentStatus: PaymentStatus,
+  paymentTxnId?: string
+) {
+  const docRef = doc(db, 'selected_teams', id);
+  await updateDoc(docRef, {
+    paymentStatus,
+    paymentTxnId: paymentTxnId || `TXN-${Date.now()}`,
+    updatedAt: new Date().toISOString(),
+  }).catch(async () => {
+    await setDoc(docRef, {
+      paymentStatus,
+      paymentTxnId: paymentTxnId || `TXN-${Date.now()}`,
+      updatedAt: new Date().toISOString(),
+    }, { merge: true });
+  });
+}
+
+export async function deleteFirestoreSelectedTeam(db: Firestore, id: string) {
+  await deleteDoc(doc(db, 'selected_teams', id));
+}
+
