@@ -38,7 +38,6 @@ export const DashboardPage: React.FC = () => {
     updateTeam,
     deleteTeam,
     bulkDeleteTeams,
-    toggleShortlistTeam,
     selectedTeam,
     setSelectedTeam
   } = useCommandCenter();

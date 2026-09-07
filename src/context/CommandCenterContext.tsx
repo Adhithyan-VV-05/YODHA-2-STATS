@@ -31,7 +31,7 @@ import type { ReferralRoom } from '../services/firestoreService';
 import type { Firestore } from 'firebase/firestore';
 import { useToast } from './ToastContext';
 import { useAdminAuth } from './AdminAuthContext';
-import { formatISTDateTime, formatDuration } from '../utils/formatters';
+import { formatISTDateTime } from '../utils/formatters';
 
 interface CommandCenterContextType {
   teams: Team[];
@@ -377,7 +377,7 @@ export function CommandCenterProvider({ children }: { children: ReactNode }) {
   };
 
   const updateTotalVisitorsCount = async (count: number) => {
-    setSiteAnalyticsDoc(prev => ({ ...(prev || {}), totalVisits: count }));
+    setSiteAnalyticsDoc((prev: any) => ({ ...(prev || {}), totalVisits: count }));
     if (firestoreDb) {
       try {
         await updateTotalVisitsInFirestore(firestoreDb, count);

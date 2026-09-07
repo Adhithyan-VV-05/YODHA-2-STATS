@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useCommandCenter } from '../../context/CommandCenterContext';
 import { useAdminAuth } from '../../context/AdminAuthContext';
-import { Search, Clock, Users, Shield, Lock, Unlock } from 'lucide-react';
+import { Search, Clock, Shield, Lock, Unlock } from 'lucide-react';
 import { StatusBadge } from '../common/StatusBadge';
 import { formatISTTime } from '../../utils/formatters';
 
 export const TopBar: React.FC = () => {
   const {
     isFirebaseConnected,
-    sessions,
     setCommandPaletteOpen
   } = useCommandCenter();
 
@@ -23,8 +22,6 @@ export const TopBar: React.FC = () => {
     setIstTimeStr(formatISTTime(new Date()));
     return () => clearInterval(timer);
   }, []);
-
-  const onlineVisitorsCount = sessions.filter(s => s.isOnline).length;
 
   return (
     <header className="h-16 border-b border-slate-200 bg-white px-6 flex items-center justify-between sticky top-0 z-40 font-sans shadow-xs">

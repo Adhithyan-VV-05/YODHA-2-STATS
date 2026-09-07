@@ -19,7 +19,7 @@ import { useAdminAuth } from '../../context/AdminAuthContext';
 
 export const Sidebar: React.FC = () => {
   const [isCollapsed, setIsCollapsed] = useState<boolean>(false);
-  const { teams, selectedTeams, sessions } = useCommandCenter();
+  const { teams, selectedTeams } = useCommandCenter();
   const { isAdminAuthenticated } = useAdminAuth();
 
   const navItems = [

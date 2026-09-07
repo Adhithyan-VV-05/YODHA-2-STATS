@@ -1,6 +1,6 @@
 import { collection, doc, onSnapshot, query, limit, setDoc, deleteDoc, updateDoc } from 'firebase/firestore';
 import type { Firestore } from 'firebase/firestore';
-import type { Team, TeamMember, TrackType } from '../types/team';
+import type { Team, TeamMember, TrackType, SelectedTeam, PaymentStatus } from '../types/team';
 import type { VisitorSession, DeviceType, BrowserType, OsType, TabStatus } from '../types/session';
 
 function mapTrackName(rawTrack: string): TrackType {

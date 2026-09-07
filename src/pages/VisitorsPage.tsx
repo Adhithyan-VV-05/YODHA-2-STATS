@@ -8,8 +8,6 @@ import {
   Activity,
   Search,
   Trash2,
-  Edit2,
-  CheckCircle2,
   Save
 } from 'lucide-react';
 
@@ -19,7 +17,6 @@ export const VisitorsPage: React.FC = () => {
 
   const [search, setSearch] = useState('');
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
-  const [isEditingCount, setIsEditingCount] = useState(false);
   const [customVisitorsCount, setCustomVisitorsCount] = useState<string>(String(metrics.totalVisits));
 
   // Filtered Visitor Sessions Table (Full list, time sorted)
@@ -61,7 +58,6 @@ export const VisitorsPage: React.FC = () => {
     const val = parseInt(customVisitorsCount, 10);
     if (!isNaN(val) && val >= 0) {
       await updateTotalVisitorsCount(val);
-      setIsEditingCount(false);
     }
   };
 

@@ -10,11 +10,6 @@ import {
   Trash2,
   Edit2,
   ExternalLink,
-  ShieldCheck,
-  User,
-  Mail,
-  Phone,
-  DollarSign,
   AlertCircle,
   X
 } from 'lucide-react';

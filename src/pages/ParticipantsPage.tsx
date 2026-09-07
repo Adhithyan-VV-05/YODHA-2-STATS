@@ -15,8 +15,7 @@ import {
   GitBranch,
   Edit3,
   Trash2,
-  Calendar,
-  User
+  Calendar
 } from 'lucide-react';
 
 export const ParticipantsPage: React.FC = () => {

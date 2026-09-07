@@ -17,9 +17,6 @@ import {
   Edit3,
   FileSpreadsheet,
   FileText,
-  CheckSquare,
-  Square,
-  CheckCircle2,
   Award
 } from 'lucide-react';
 
